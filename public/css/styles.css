@@ -1,0 +1,30 @@
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+
+.jumbotron {
+    background-image: url("../images/cinema_background.jpg");
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: center;
+    
+}
+
+.jumbotron .container {
+    background-image: url("../images/50pcblack.png");
+    border-radius: 25px;
+    text-align: center;
+    padding: 20px;
+}
+
+.jumbotron .container h1 {
+    color: white;
+    font-weight: bolder;
+    font-size: 50px;
+}
+
+.jumbotron .container p {
+    color: white;
+}
