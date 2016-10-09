@@ -1,3 +1,27 @@
-<h1>Search#index</h1>
-<p>Find me in app/views/search/index.html.erb</p>
-<p>Title: <%= params[:search] %></p>
+<% require 'net/http' %>
+<% require 'json' %>
+<% url = "https://api.themoviedb.org/3/search/movie?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US&query=" + params[:search] %>
+<div class="container">
+    <h1>Searching for "<%= params[:search] %>"</h1>
+    <% uri = URI(url) 
+    response = Net::HTTP.get(uri)
+    results = JSON.parse(response) %> 
+    <p>Page <%= results["page"] %> of <%= results["total_pages"] %> (Total number of results: <%= results["total_results"] %>)</p>
+    <% results["results"].each_with_index { |r, i| %>
+        <div class="row">
+            <div class="col-md-4 poster">
+                <% if r["poster_path"] != nil %>
+                    <img src='<%= "https://image.tmdb.org/t/p/w300" + r["poster_path"] %>' ><br>
+                <% end %>
+            </div>
+            <div class="col-md-8 details">
+                <h2><%= i+1 %>. <%= r["title"] %></h2>
+                <p><%= r["overview"] %></p>
+                <p>Released: <%= r["release_date"] %></p>
+                <p>Genres: <%= r["genre_ids"] %> </p>
+                <p>ID: <%= r["id"] %> </p>
+            </div>
+        </div>
+        <hr>
+    <% } %>
+</div>
