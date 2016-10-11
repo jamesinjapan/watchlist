@@ -7,6 +7,7 @@ To Do:
   - Pressed buttons can be unpressed
   - Buttons contribute to a hash of variables
   - New search query can be processed by submitting variables to API
+  - Styling
 - Search suggestions on front page
 - User accounts
 - Styling

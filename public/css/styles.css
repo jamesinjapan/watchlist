@@ -4,29 +4,39 @@ body {
   padding-bottom: 20px;
 }
 
-.jumbotron {
-    background-image: url("../images/cinema_background.jpg");
+.container:not(:first-child)  {
+  background-color: #f4f4f4;
+}
+
+.frontpage {
     background-size: cover;
     background-attachment: scroll;
     background-position: center;
-    
+    height: 100vh;
+}
+
+.frontpage .container {
+  margin-top: 15vh;
+  height: 50vh;
+  border-radius: 25px;
 }
 
 .jumbotron .container {
-    background-image: url("../images/50pcblack.png");
-    border-radius: 25px;
-    text-align: center;
-    padding: 20px;
+  background-image: url("../images/75pcblack.png");
+  color: white;
 }
 
-.jumbotron .container h1 {
-    color: white;
-    font-weight: bolder;
-    font-size: 50px;
+.frontpage .container h1 {
+  text-align: center;
+  color: white;
+  font-weight: 600;
+  padding: 30px;
 }
 
-.jumbotron .container p {
-    color: white;
+.frontpage .container h2 {
+  text-align: center;
+  color: white;
+  padding: 20px
 }
 
 .row-eq-height {
@@ -100,4 +110,16 @@ body {
 
 .synopsis {
   text-align: justify;
+}
+
+.carousel-inner { 
+  text-align: center;
+}
+
+.carousel .item img, .carousel .item a img {
+  display: inline-block;
+}
+
+.carousel-caption {
+  background-image: url("../images/75pcblack.png");
 }
