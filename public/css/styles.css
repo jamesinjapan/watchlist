@@ -28,3 +28,63 @@ body {
 .jumbotron .container p {
     color: white;
 }
+
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+  flex-flow: row wrap;
+}
+
+.search_result {
+    padding: 25px;
+    text-align: center;
+}
+
+.search_pages {
+    text-align: center;
+    background-color: #3B3333;
+    color: white;
+    
+}
+
+.search_pages a {
+    text-decoration: none;
+    color: white;
+}
+
+.movie_details {
+    background-image: url("../images/75pcblack.png");
+    border-radius: 5px;
+    padding: 10px;
+    margin: 25px 0px;
+    color: white;
+}
+
+.movie_details a {
+    color: rgb(180, 240, 241);
+}
+
+.movie_details .btn {
+    padding: 2px 5px;
+    margin: 2px 5px;
+}
+
+.movie_details .review_content {
+    color: black;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 15px 5px;
+}
+
+.movie_details .review_content a {
+    color: blue;
+}
+
+.movie_poster {
+    border-radius: 25px;
+    text-align: center;
+    padding: 10px;
+    margin: 25px 0px;
+}

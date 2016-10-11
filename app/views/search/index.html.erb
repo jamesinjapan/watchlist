@@ -1,27 +1,56 @@
-<% require 'net/http' %>
-<% require 'json' %>
-<% url = "https://api.themoviedb.org/3/search/movie?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US&query=" + params[:search] %>
+<% 
+# Libraries for JSON
+require 'net/http' 
+require 'json' 
+
+# Set current page
+current_page = params[:page].to_i
+current_page = 1 if params[:page] == nil
+
+# Get JSON data from tmdb
+url = "https://api.themoviedb.org/3/search/movie?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US&query=" + params[:search] + "&page=" + current_page.to_s
+uri = URI(url) 
+response = Net::HTTP.get(uri)
+results = JSON.parse(response) 
+
+# Set page variables
+total_pages = 1000
+total_pages = results["total_pages"] if results["total_pages"] < 1000
+
+if current_page - 4 > 1 
+  lowest_page = current_page - 4
+else
+  lowest_page = 1
+end
+
+highest_page = (current_page + 9) - (current_page - lowest_page) 
+highest_page = total_pages if highest_page > total_pages
+%>
 <div class="container">
-    <h1>Searching for "<%= params[:search] %>"</h1>
-    <% uri = URI(url) 
-    response = Net::HTTP.get(uri)
-    results = JSON.parse(response) %> 
-    <p>Page <%= results["page"] %> of <%= results["total_pages"] %> (Total number of results: <%= results["total_results"] %>)</p>
+  <h1>Searching for "<%= params[:search] %>"</h1>
+  <p>Page <%= results["page"] %> of <%= results["total_pages"] %> (Total number of results: <%= results["total_results"] %>)</p>
+  <%= render partial: "shared/search_pages", locals: {current_page: current_page, lowest_page: lowest_page, highest_page: highest_page, total_pages: total_pages} %>
+  <div class="row row-eq-height">
     <% results["results"].each_with_index { |r, i| %>
+      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 search_result">
         <div class="row">
-            <div class="col-md-4 poster">
-                <% if r["poster_path"] != nil %>
-                    <img src='<%= "https://image.tmdb.org/t/p/w300" + r["poster_path"] %>' ><br>
-                <% end %>
-            </div>
-            <div class="col-md-8 details">
-                <h2><%= i+1 %>. <%= r["title"] %></h2>
-                <p><%= r["overview"] %></p>
-                <p>Released: <%= r["release_date"] %></p>
-                <p>Genres: <%= r["genre_ids"] %> </p>
-                <p>ID: <%= r["id"] %> </p>
-            </div>
+          <div class="col-xs-12">
+            <% if r["poster_path"] == nil %>
+              <%= link_to image_tag('noposter'), movie_index_path(:movie_id => r["id"])  %>
+            <% else %>
+              <%= link_to image_tag("https://image.tmdb.org/t/p/w154" + r["poster_path"]), movie_index_path(:movie_id => r["id"]) %>
+            <% end %>
+          </div>
+          <div class="col-xs-12">
+            <% if r["release_date"][0..3] == "" %>
+              <%= link_to r["title"], movie_index_path(:movie_id => r["id"]) %>
+            <% else %>
+              <%= link_to r["title"] + " (" + r["release_date"][0..3] + ")", movie_index_path(:movie_id => r["id"]) %>
+            <% end %>
+          </div>
         </div>
-        <hr>
+      </div>
     <% } %>
+  </div>
+  <%= render partial: "shared/search_pages", locals: {current_page: current_page, lowest_page: lowest_page, highest_page: highest_page, total_pages: total_pages} %>
 </div>

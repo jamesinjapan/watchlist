@@ -1,0 +1,88 @@
+<%
+# Libraries for JSON
+require 'net/http' 
+require 'json' 
+
+movie_id = params["movie_id"]
+
+# Get JSON data from tmdb
+url = "https://api.themoviedb.org/3/movie/" + movie_id + "?api_key=553017e076c2ecd01b7bf9cdd20a6360&append_to_response=keywords,credits,recommendations,similar,reviews"
+uri = URI(url) 
+response = Net::HTTP.get(uri)
+m = JSON.parse(response) 
+%>
+<div class="container">
+  <div class="row" <%= " style='background-image: url('http://image.tmdb.org/t/p/w1280" + m["backdrop_path"]+ "');" if m["backdrop_path"] != nil %> >
+    <div class="col-xs-4 col-md-3 movie_poster">
+      <% if m["poster_path"] == nil %>
+        <%= image_tag('noposter', :class => "img-responsive")  %>
+      <% else %>
+        <%= image_tag("https://image.tmdb.org/t/p/w300" + m["poster_path"], :class => "img-responsive") %>
+      <% end %>
+      <br><br>
+      <% tmdb_recommends = m["recommendations"]["results"] + m["similar"]["results"] %>
+      <p><b>How about these?</b></p> 
+      <% tmdb_recommends.sort! { |x,y| y["popularity"] <=> x["popularity"] }
+      tmdb_recommends.uniq! { |v| v["id"] }
+      tmdb_recommends.each_with_index do |v,i| 
+        if v["poster_path"] == nil %>
+          <%= link_to image_tag('noposter', :class => "img-responsive"), movie_index_path(:movie_id => v["id"])  %>
+        <% else %>
+          <%= link_to image_tag("https://image.tmdb.org/t/p/w300" + v["poster_path"], :class => "img-responsive"), movie_index_path(:movie_id => v["id"]) %>
+        <% end %>
+        <br>
+        <% if v["release_date"][0..3] == "" %>
+          <%= link_to v["title"], movie_index_path(:movie_id => v["id"]) %>
+        <% else %>
+          <%= link_to v["title"] + " (" + v["release_date"][0..3] + ")", movie_index_path(:movie_id => v["id"]) %>
+        <% end %>
+        <br><br>
+      <% end %>
+    </div>
+    <div class="col-xs-8 col-md-9 movie_details">
+      <h1><%= m["title"] %></h1>
+      <h4><%= m["tagline"] %></h4>
+      <p><b>Release date:</b> <%= m["release_date"] %></p>
+      <p><b>Runtime:</b> <%= m["runtime"] %> minutes</p>
+      <p><b>Languages:</b> 
+      <% m["spoken_languages"].each_with_index do |v,i| %>
+        <%= button_tag v["name"], :class => "btn btn-primary" %> <!-- movie_index_path(:language_id => v["iso_639_1"]) -->
+      <% end %></p>
+      <p><b>Synopsis:</b></p>
+      <p><%= m["overview"] %></p>
+      <p><b>Genres:</b> 
+      <% m["genres"].each_with_index do |v,i| %>
+        <%= button_tag v["name"], :class => "btn btn-primary" %> <!-- movie_index_path(:genre_id => v["id"]) -->
+      <% end %></p>
+      <p><b>Keywords:</b> 
+      <% m["keywords"]["keywords"].each_with_index do |v,i| %>
+        <%= button_tag v["name"], :class => "btn btn-primary" %> <!-- movie_index_path(:keyword_id => v["id"]) -->
+      <% end %></p>
+      <p><b>Production Companies:</b> 
+      <% m["production_companies"].each_with_index do |v,i| %>
+        <%= button_tag v["name"], :class => "btn btn-primary" %> <!-- movie_index_path(:production_company_id => v["id"]) -->
+      <% end %></p>
+      <p><b>Production Countries:</b> 
+      <% m["production_countries"].each_with_index do |v,i| %>
+        <%= button_tag v["name"], :class => "btn btn-primary" %> <!-- movie_index_path(:production_country_id => v["iso_3166_1"]) -->
+      <% end %></p>
+      <p><b>Crew:</b> 
+      <% notable_crew = ["Director","Writer","Director of Photography","Original Music Composer","Stunt Coordinator"]
+      m["credits"]["crew"].each_with_index do |v,i| %>
+        <% if notable_crew.include?(v["job"]) %>
+          <%= button_tag v["name"], :class => "btn btn-primary" %> <!-- movie_index_path(:credits_id => v["id"]) -->
+        <% end %>
+      <% end %></p>
+      <p><b>Cast:</b> 
+      <% m["credits"]["cast"].each_with_index do |v,i| %>
+        <%= button_tag v["name"], :class => "btn btn-primary" %> <!-- movie_index_path(:credits_id => v["id"]) -->
+      <% end %></p>
+      <p><b>Reviews:</b></p>
+      <% m["reviews"]["results"].each_with_index do |v,i| %>
+        <p class="review_content bg-warning"><b>Review by <%=v["author"] %></b><br>
+        <%= raw truncate(v["content"], :length => 1000, :separator => ' ') + " " %> 
+        <%= link_to "(read more)" , v["url"] %></p>
+      <% end %>
+    </div>
+  </div>
+  

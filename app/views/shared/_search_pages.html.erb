@@ -1,0 +1,24 @@
+<p class="search_pages">
+  <% if lowest_page != 1 %>
+    <%= link_to "<<", url_for(params.merge(:page => "1")) if lowest_page > 2 %>
+    <%= "  " if lowest_page > 2 %>
+    <%= link_to "<", url_for(params.merge(:page => current_page-1)) if lowest_page > 1 %>
+    <%= "  " if lowest_page > 1 %>
+  <% end %>
+  <% for i in lowest_page..highest_page %>
+    <% if current_page == i %>
+      <b>
+    <% end %>
+    <%= link_to i, url_for(params.merge(:page => i)) %>
+    <% if current_page == i %>
+      </b>
+    <% end %>
+    <%= "  " if i != total_pages %>
+  <% end %>
+  <% if highest_page != total_pages %>
+    <%= link_to ">", url_for(params.merge(:page => current_page+1)) if highest_page < total_pages - 1  %>
+    <%= "  " if lowest_page > 2 %>
+    <%= link_to ">>", url_for(params.merge(:page => total_pages)) if highest_page < total_pages - 2 %>
+    <%= "  " if lowest_page > 1 %>
+  <% end %>
+</p>
