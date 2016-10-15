@@ -4,6 +4,8 @@ Rails.application.routes.draw do
 
   get 'search/index'
   post 'search/index'
+  get 'search/movietitlelookup' => 'search#movieTitleLookup'
+  get 'search/movietitle' => 'search#movieTitleAutocomplete'
 
   get 'welcome/index'
   post 'welcome/index'

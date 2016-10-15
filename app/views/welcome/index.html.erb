@@ -1,16 +1,12 @@
-<div class="jumbotron frontpage" style="background-image: url('../images/film_negative_jumbotron.jpg'); border-radius:0px; height: 100vh;" >
+<div class="jumbotron frontpage" style="background-image: url('../images/film_negative_jumbotron.jpg'); border-radius:0px;" >
   <div class="container">
-    <h1>New Movies, New Experiences</h1>
-    <h2>What was the last movie you watched and loved?</h2>
-     <div class="col-lg-offset-4 col-lg-4">
-        <form action="<%= search_index_path %>" method="get">
-        <div class="input-group">
-          <%= text_field_tag :search, params[:search], :class => "form-control", :placeholder => "Tell us your favorite movie!" %>
-          <span class="input-group-btn">
-            <%= submit_tag "Go!", :class => "btn btn-primary", :name => nil %>
-          </span>
-        </div>
-        </form>
+    <div class="row">
+      <div class="col-lg-offset-2 col-lg-8">
+        <h1>New Movies, New Experiences</h1>
+        <p>WatchList is your personal movie recommendation engine. Feed it the title of a movie you loved and discover a whole new world of entertainment you might have missed. New movies, old movies, artsy movies, blockbusters &mdash; WatchList has you covered.</p>
+        <h3>What was the last movie you watched and loved?</h3>
+        <%= render partial: "shared/movie_title_lookup" %>
+      </div>
     </div>
   </div>
 </div>

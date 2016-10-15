@@ -8,6 +8,6 @@ To Do:
   - Buttons contribute to a hash of variables
   - New search query can be processed by submitting variables to API
   - Styling
-- Search suggestions on front page
+  - Handle duplicate search forms on front page
 - User accounts
 - Styling

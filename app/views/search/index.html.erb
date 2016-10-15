@@ -4,11 +4,11 @@ require 'net/http'
 require 'json' 
 
 # Set current page
-current_page = params[:page].to_i
-current_page = 1 if params[:page] == nil
+current_page = params[:p].to_i
+current_page = 1 if params[:p] == nil
 
 # Get JSON data from tmdb
-url = "https://api.themoviedb.org/3/search/movie?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US&query=" + params[:search] + "&page=" + current_page.to_s
+url = "https://api.themoviedb.org/3/search/movie?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US&query=" + params[:t] + "&page=" + current_page.to_s
 uri = URI(url) 
 response = Net::HTTP.get(uri)
 results = JSON.parse(response) 
@@ -27,7 +27,8 @@ highest_page = (current_page + 9) - (current_page - lowest_page)
 highest_page = total_pages if highest_page > total_pages
 %>
 <div class="container">
-  <h1>Searching for "<%= params[:search] %>"</h1>
+  <%= render partial: "shared/movie_title_lookup" %>
+  <h1>Searching for "<%= params[:t] %>"</h1>
   <p>Page <%= results["page"] %> of <%= results["total_pages"] %> (Total number of results: <%= results["total_results"] %>)</p>
   <%= render partial: "shared/search_pages", locals: {current_page: current_page, lowest_page: lowest_page, highest_page: highest_page, total_pages: total_pages} %>
   <div class="row row-eq-height">
@@ -36,16 +37,16 @@ highest_page = total_pages if highest_page > total_pages
         <div class="row">
           <div class="col-xs-12">
             <% if r["poster_path"] == nil %>
-              <%= link_to image_tag('noposter'), movie_index_path(:movie_id => r["id"])  %>
+              <%= link_to image_tag('noposter'), movie_index_path(:m => r["id"])  %>
             <% else %>
-              <%= link_to image_tag("https://image.tmdb.org/t/p/w154" + r["poster_path"]), movie_index_path(:movie_id => r["id"]) %>
+              <%= link_to image_tag("https://image.tmdb.org/t/p/w154" + r["poster_path"]), movie_index_path(:m => r["id"]) %>
             <% end %>
           </div>
           <div class="col-xs-12">
             <% if r["release_date"][0..3] == "" %>
-              <%= link_to r["title"], movie_index_path(:movie_id => r["id"]) %>
+              <%= link_to r["title"], movie_index_path(:m => r["id"]) %>
             <% else %>
-              <%= link_to r["title"] + " (" + r["release_date"][0..3] + ")", movie_index_path(:movie_id => r["id"]) %>
+              <%= link_to r["title"] + " (" + r["release_date"][0..3] + ")", movie_index_path(:m => r["id"]) %>
             <% end %>
           </div>
         </div>

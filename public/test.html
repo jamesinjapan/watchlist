@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <title>jQuery UI Autocomplete functionality</title>
+      <link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+      <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+      <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+      <!-- Javascript -->
+      <script>
+         $(function() {
+            var popularMovies = [];
+            $.getJSON('https://api.themoviedb.org/3/movie/popular?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US', function(data){
+              $.each(data['results'], function(i, field){
+                  popularMovies.push(field['title']);
+              });
+            });
+            $( "#movie-title-lookup" ).autocomplete({
+               source: popularMovies,
+               autoFocus:true
+            });
+         });
+      </script>
+   </head>
+   <body>
+      <!-- HTML --> 
+      <div class="ui-widget">
+         <label for="movie-title-lookup">Tags: </label>
+         <input id="movie-title-lookup">
+      </div>
+   </body>
+</html>

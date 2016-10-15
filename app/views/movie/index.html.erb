@@ -3,7 +3,7 @@
 require 'net/http' 
 require 'json' 
 
-movie_id = params["movie_id"]
+movie_id = params[:m]
 
 # Get JSON data from tmdb
 url = "https://api.themoviedb.org/3/movie/" + movie_id + "?api_key=553017e076c2ecd01b7bf9cdd20a6360&append_to_response=keywords,credits,recommendations,similar,reviews"
@@ -23,11 +23,13 @@ tmdb_recommends.delete_if { |v| v["poster_path"] == nil } %>
   <% if m["backdrop_path"] != nil %>
     <div class="jumbotron" style="background-image: url('http://image.tmdb.org/t/p/w1280<%= m["backdrop_path"] %>'); border-radius:0px;" >
       <div class="container">
+        <%= render partial: "shared/movie_title_lookup" %>
         <h1><%= m["title"] %><br><small><%= m["tagline"] %></small></h1>
       </div>
     </div>
   <% else %>
     <div class="col-xs-12 page-header">
+      <%= render partial: "shared/movie_title_lookup" %>
       <h1><%= m["title"] %><br><br><small><%= m["tagline"] %></small></h1>
     </div>
   <% end %>
@@ -59,7 +61,7 @@ tmdb_recommends.delete_if { |v| v["poster_path"] == nil } %>
         </div>
         <% tmdb_recommends.each_with_index do |v,i| %>
           <div class="item">
-            <%= link_to image_tag("https://image.tmdb.org/t/p/w600" + v["poster_path"], :class => "img-responsive", :alt =>  "#{v["title"]} #{v["release_date"]}"), movie_index_path(:movie_id => v["id"]) %>
+            <%= link_to image_tag("https://image.tmdb.org/t/p/w600" + v["poster_path"], :class => "img-responsive", :alt =>  "#{v["title"]} #{v["release_date"]}"), movie_index_path(:m => v["id"]) %>
           </div>
         <% end %>
       </div>
