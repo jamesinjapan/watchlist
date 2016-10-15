@@ -1,0 +1,72 @@
+<%
+require 'net/http' 
+require 'json' 
+
+recommendation_list = []
+compare = []
+
+if @genres != nil 
+  url = "https://api.themoviedb.org/3/genre/" + @genres.join("+") + "/movies?api_key=553017e076c2ecd01b7bf9cdd20a6360"
+  uri = URI(url) 
+  response = Net::HTTP.get(uri)
+  results = JSON.parse(response) 
+  results["results"].each do |v|
+    recommendation_list.push(v.slice("id","title","release_date","poster_path"))
+  end
+end
+
+if @keywords != nil 
+  url = "https://api.themoviedb.org/3/keyword/" + @keywords.join("+") + "/movies?api_key=553017e076c2ecd01b7bf9cdd20a6360"
+  uri = URI(url) 
+  response = Net::HTTP.get(uri)
+  results = JSON.parse(response) 
+  results["results"].each do |v|
+    recommendation_list.push(v.slice("id","title","release_date","poster_path"))
+  end
+end
+
+if @credits != nil 
+  url = "https://api.themoviedb.org/3/person/" + @credits.join("+") + "/movie_credits?api_key=553017e076c2ecd01b7bf9cdd20a6360"
+  uri = URI(url) 
+  response = Net::HTTP.get(uri)
+  results = JSON.parse(response) 
+  results["cast"].each do |v|
+    recommendation_list.push(v.slice("id","title","release_date","poster_path"))
+  end
+  results["crew"].each do |v|
+    recommendation_list.push(v.slice("id","title","release_date","poster_path"))
+  end
+end
+
+recommendation_list.sort! { |x,y| y["popularity"] <=> x["popularity"] }
+recommendation_list.uniq! { |v| v["id"] }
+recommendation_list.delete_if { |v| v["poster_path"] == nil } 
+recommendation_list.delete_if { |v| v["id"].to_s == @current_movie.to_s } 
+%>
+<div class="container">
+  <%= render partial: "shared/movie_title_lookup" %>
+  <h1>Recommendations for you</h1>
+  <div class="row row-eq-height">
+    <% recommendation_list.each_with_index { |r, i| %>
+      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 search_result">
+        <div class="row">
+          <div class="col-xs-12">
+            <% if r["poster_path"] == nil %>
+              <%= link_to image_tag('noposter'), movie_index_path(:m => r["id"])  %>
+            <% else %>
+              <%= link_to image_tag("https://image.tmdb.org/t/p/w154" + r["poster_path"]), movie_index_path(:m => r["id"]) %>
+            <% end %>
+          </div>
+          <div class="col-xs-12">
+            <% if r["release_date"][0..3] == "" %>
+              <%= link_to r["title"], movie_index_path(:m => r["id"]) %>
+            <% else %>
+              <%= link_to r["title"] + " (" + r["release_date"][0..3] + ")", movie_index_path(:m => r["id"]) %>
+            <% end %>
+            
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>

@@ -145,3 +145,23 @@ body {
   background-color: #f4f4f4;
   text-align: center;
 }
+
+legend {
+  margin-bottom: 5px;
+  font-size: large;
+}
+
+fieldset {
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+fieldset label {
+  border: 1px black solid;
+  background-color: #337ab7;
+  padding: 5px;
+  color: white;
+  border-radius: 2px;
+  font-weight: normal;
+}

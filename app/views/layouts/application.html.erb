@@ -28,12 +28,50 @@
     <link href="/css/jquery-ui.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+    
+    <script>
+      $(document).ready( function() {
+        $(function() {
+          $( '#movie-title-lookup' ).autocomplete({
+            source: function(request, response){
+              $.ajax({
+                url: '<%= search_movietitle_path %>',
+                dataType: "json",
+                data: { t: request.term },
+                success: function( data ) {
+                  response( $.map( data, function( item ) {
+                    return { 
+                      label: item.label,
+                      value: item.value,
+                      poster: item.poster,
+                      popularity: item.popularity
+                    }   
+                  }));
+                }
+              });
+            },
+            minLength: 3,
+            focus: function(event, ui) {
+              $(this).val(ui.item.label);
+              return false;
+            },
+            select: function(event, ui) {
+              $('#movie-id').val(ui.item.value);
+              $(this).val(ui.item.label);
+              $("#movie-lookup-form").submit();
+              return false;
+            }
+          });
+        });
+      });  
+    </script>
   </head>
 
   <body>

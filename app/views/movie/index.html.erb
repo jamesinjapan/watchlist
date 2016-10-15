@@ -21,7 +21,7 @@ tmdb_recommends.uniq! { |v| v["id"] }
 tmdb_recommends.delete_if { |v| v["poster_path"] == nil } %>
 <div class="container">
   <% if m["backdrop_path"] != nil %>
-    <div class="jumbotron" style="background-image: url('http://image.tmdb.org/t/p/w1280<%= m["backdrop_path"] %>'); border-radius:0px;" >
+    <div class="jumbotron" style="background-image: url('https://image.tmdb.org/t/p/w1280<%= m["backdrop_path"] %>'); border-radius:0px;" >
       <div class="container">
         <%= render partial: "shared/movie_title_lookup" %>
         <h1><%= m["title"] %><br><small><%= m["tagline"] %></small></h1>
@@ -48,7 +48,7 @@ tmdb_recommends.delete_if { |v| v["poster_path"] == nil } %>
         <div class="content"><%= m["overview"] %></div>
       </div>
     </div>
-    <div id="recommendation-poster-carousel" class="col-xs-12 col-sm-offset-1 col-sm-10 col-md-offset-0 col-md-8 carousel slide" data-ride="carousel">
+    <div id="recommendation-poster-carousel" class="col-xs-12 carousel slide" data-ride="carousel">
       <h3>If you liked <%= m["title"] %>, try:</h3>
       <!-- Wrapper for slides -->
       <div class="carousel-inner" role="listbox">
@@ -76,69 +76,71 @@ tmdb_recommends.delete_if { |v| v["poster_path"] == nil } %>
         <span class="sr-only">Next</span>
       </a>
     </div>
-    <div class="col-xs-12 col-md-4">
-      <h3>Or customize your recommendations by selecting filters below:</h3>
-      <div class="col-xs-12 movie-genres">
-        <div class="heading">Genres</div>
-        <div class="btn-group" data-toggle="buttons">
-          <% m["genres"].each_with_index do |v,i| %>
-            <%= button_tag raw(glyphicon_plus + v["name"]), class:"btn btn-primary" %> <!-- movie_index_path(:genre_id => v["id"]) -->
-          <% end %>
-        </div>
-      </div>
-      <div class="col-xs-12 movie-keywords">
-        <div class="heading">Keywords</div>
-        <div class="btn-group" data-toggle="buttons">
-          <% m["keywords"]["keywords"].each_with_index do |v,i| %>
-            <%= button_tag raw(glyphicon_plus + v["name"]), :class => "btn btn-primary" %> <!-- movie_index_path(:keyword_id => v["id"]) -->
-          <% end %>
-        </div>
-      </div>
-      <div class="col-xs-12 movie-production-companies">
-        <div class="heading">Production Companies</div>
-        <div class="btn-group" data-toggle="buttons">
-          <% m["production_companies"].each_with_index do |v,i| %>
-            <%= button_tag raw(glyphicon_plus + v["name"]), :class => "btn btn-primary" %> <!-- movie_index_path(:production_company_id => v["id"]) -->
-          <% end %>
-        </div>
-      </div>
-      <div class="col-xs-12 movie-production-countries">
-        <div class="heading">Production Countries</div>
-        <div class="btn-group" data-toggle="buttons">
-          <% m["production_countries"].each_with_index do |v,i| %>
-            <%= button_tag raw(glyphicon_plus + v["name"]), :class => "btn btn-primary" %> <!-- movie_index_path(:production_country_id => v["iso_3166_1"]) -->
-          <% end %>
-        </div>
-      </div>
-      <div class="col-xs-12 movie-languages">
-        <div class="heading">Spoken languages</div>
-        <div class="btn-group" data-toggle="buttons">
-          <% m["spoken_languages"].each_with_index do |v,i| %>
-              <%= button_tag raw(glyphicon_plus + v["name"]), :class => "btn btn-primary" %> <!-- movie_index_path(:language_id => v["iso_639_1"]) -->
-          <% end %>
-        </div>
-      </div>
-    </div>
     <div class="col-xs-12">
-      <div class="col-xs-12 movie-crew">
-        <div class="heading">Crew</div>
-        <div class="btn-group" data-toggle="buttons">
-          <% notable_crew = ["Director","Writer","Director of Photography","Original Music Composer","Stunt Coordinator"]
-          m["credits"]["crew"].each_with_index do |v,i| %>
-            <% if notable_crew.include?(v["job"]) %>
-              <%= button_tag raw(glyphicon_plus + v["name"]), :class => "btn btn-primary" %> <!-- movie_index_path(:credits_id => v["id"]) -->
-            <% end %>
+      <h4>Customize your recommendations by selecting filters below:</h4>
+      <form action="<%= recommendation_index_path %>" method="get" id="recommendation-filter-form">
+        <fieldset>
+          <legend>Genres: </legend>
+          <% m["genres"].each_with_index do |v,i| %>
+              <label for="checkbox-genres-<%= i %>"><%= v["name"] %>
+                <%= check_box_tag "g[]", v["id"], false, :class => 'checkbox-genres' %>
+              </label>
           <% end %>
-        </div>
-      </div>
-      <div class="col-xs-12 movie-cast">
-        <div class="heading">Cast</div>
-        <div class="btn-group" data-toggle="buttons">
-          <% m["credits"]["cast"].each_with_index do |v,i| %>
-            <%= button_tag raw(glyphicon_plus + v["name"]), :class => "btn btn-primary" %> <!-- movie_index_path(:credits_id => v["id"]) -->
+        </fieldset>
+        <fieldset>
+          <legend>Keywords: </legend>
+          <% m["keywords"]["keywords"].each_with_index do |v,i| %>
+            <label for="checkbox-keywords-<%= i %>"><%= v["name"] %>
+              <%= check_box_tag "k[]", v["id"], false, :class => 'checkbox-keywords' %>
+            </label>
           <% end %>
-        </div>
-      </div>
+        </fieldset>
+        <fieldset>
+          <legend>Production Countries: </legend>
+          <% m["production_countries"].each_with_index do |v,i| %>
+            <label for="checkbox-production-countries-<%= i %>"><%= v["name"] %>
+              <%= check_box_tag "pc[]", v["iso_3166_1"], false, :class => 'checkbox-production-countries' %>
+            </label>
+          <% end %>
+        </fieldset>
+        <fieldset>
+          <legend>Spoken Languages: </legend>
+          <% m["spoken_languages"].each_with_index do |v,i| %>
+            <label for="checkbox-spoken-languages-<%= i %>"><%= v["name"] %>
+              <%= check_box_tag "sl[]", v["iso_639_1"], false, :class => 'checkbox-spoken-languages' %>
+            </label>
+          <% end %>
+        </fieldset>
+        <fieldset>
+          <legend>Crew: </legend>
+          <% notable_crew = ["Director","Writer","Director of Photography","Original Music Composer","Stunt Coordinator"] 
+             crew = [] 
+             m["credits"]["crew"].each do |v| 
+               if notable_crew.include?(v["job"])
+                 crew.push("id" => v["id"], "name" => v["name"])
+              end 
+            end 
+            crew.uniq.each_with_index do |v,i| %>
+              <label for="checkbox-crew-<%= i %>"><%= v["name"] %>
+                <%= check_box_tag "c[]", v["id"], false, :class => 'checkbox-crew' %>
+              </label>
+          <% end %>
+        </fieldset>
+        <fieldset>
+          <legend>Cast: </legend>
+          <% cast = []
+             m["credits"]["cast"].each do |v| 
+               cast.push("id" => v["id"], "name" => v["name"])
+             end 
+             cast.uniq.each_with_index do |v,i| %>
+               <label for="checkbox-cast-<%= i %>"><%= v["name"] %>
+                 <%= check_box_tag "c[]", v["id"], false, :class => 'checkbox-cast' %>
+               </label>
+             <% end %>
+        </fieldset>
+        <%= hidden_field_tag :m, m["id"], :id => "movie-id" %>
+        <%= submit_tag "Get new recommendations", :class => "btn btn-primary", :name => nil %>
+      </form>
     </div>
     <div class="col-xs-12">
       <div class="col-xs-12 movie-reviews">

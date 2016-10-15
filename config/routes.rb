@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'recommendation/index'
+
   get 'movie/index'
   post 'movie/index'
 
