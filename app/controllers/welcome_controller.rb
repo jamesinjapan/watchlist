@@ -5,5 +5,6 @@ class WelcomeController < ApplicationController
     elsif params[:t].present?
       redirect_to search_index_path + "?t=" + params[:t]
     end
+    
   end
 end

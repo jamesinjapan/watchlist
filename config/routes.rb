@@ -7,7 +7,8 @@ Rails.application.routes.draw do
   get 'search/index'
   post 'search/index'
   get 'search/movietitlelookup' => 'search#movieTitleLookup'
-  get 'search/movietitle' => 'search#movieTitleAutocomplete'
+  get 'search/movietitlelocal' => 'search#movieTitleAutocompleteLocal'
+  get 'search/movietitleremote' => 'search#movieTitleAutocompleteRemote'
 
   get 'welcome/index'
   post 'welcome/index'

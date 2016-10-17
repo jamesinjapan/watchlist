@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0;">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
@@ -26,23 +26,39 @@
     
     <!-- JQuery UI -->
     <link href="/css/jquery-ui.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     
+    <!-- Owl Carousel -->
+    <link href="/css/owl.carousel.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+  </head>
+
+  <body>
+    <%= render partial: "shared/nav" %>
+    <%= yield %>
+    <%= render partial: "shared/footer" %>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="/js/owl.carousel.js"></script>
     
+    <!-- JQueryUI Autocomplete -->
     <script>
       $(document).ready( function() {
         $(function() {
           $( '#movie-title-lookup' ).autocomplete({
             source: function(request, response){
-              $.ajax({
-                url: '<%= search_movietitle_path %>',
+                remoteResults = $.ajax({
+                url: '<%= search_movietitleremote_path %>',
                 dataType: "json",
                 data: { t: request.term },
                 success: function( data ) {
@@ -50,12 +66,11 @@
                     return { 
                       label: item.label,
                       value: item.value,
-                      poster: item.poster,
-                      popularity: item.popularity
-                    }   
+                    };   
                   }));
                 }
               });
+              
             },
             minLength: 3,
             focus: function(event, ui) {
@@ -67,23 +82,42 @@
               $(this).val(ui.item.label);
               $("#movie-lookup-form").submit();
               return false;
+            },
+            _resizeMenu: function () {
+              var ul = this.menu.element;
+              ul.outerWidth(this.element.outerWidth());
             }
           });
         });
       });  
     </script>
-  </head>
+    
+    <!-- Owl Carousel -->
+    <script>
+    $(document).ready(function() {
 
-  <body>
-    <%= render partial: "shared/nav" %>
-    <%= yield %>
-    <%= render partial: "shared/footer" %>
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="/js/ie10-viewport-bug-workaround.js"></script>
-    <script src="/js/carousel.js"></script>
+      $(".owl-carousel").owlCarousel({
+        loop: true,
+        margin: 0,
+        nav: false,
+        center: true,
+        autoHeight: true,
+        lazyLoad: true,
+        autoplay: true,
+        autoplayHoverPause: true,
+        responsive:{
+            0:{
+                items:1
+            },
+            600:{
+                items:2
+            },
+            1000:{
+                items:4
+            }
+        }
+      });
+    });
+    </script>
 </body>
 </html>

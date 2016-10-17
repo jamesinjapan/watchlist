@@ -1,30 +1,36 @@
 body {
   padding-top: 50px;
   padding-bottom: 20px;
+  overflow-x: hidden;
+}
+
+.container-fluid {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .container:not(:first-child)  {
   background-color: #f4f4f4;
 }
 
-.frontpage {
+.jumbotron {
     background-size: cover;
     background-attachment: scroll;
-    background-position: center;
+    background-position: center 25%;
 }
 
-.frontpage .container {
-  border-radius: 25px;
+.container-fluid .frontpage .row {
   padding-bottom: 5vh;
 }
 
-.jumbotron .container {
-  background-image: url("../images/75pcblack.png");
+.container-fluid .jumbotron .row {
   color: white;
   margin: auto;
+  border-radius: 15px;
+  padding: 5%;
 }
 
-.frontpage .container h1 {
+.container-fluid .frontpage h1 {
   font-size: 250%;
   text-align: center;
   color: white;
@@ -34,7 +40,7 @@ body {
   font-family: "Oxygen";
 }
 
-.frontpage .container p {
+.container-fluid .frontpage p {
   text-align: justify;
   color: white;
   padding: 20px;
@@ -42,7 +48,7 @@ body {
   font-size: 130%;
 }
 
-.frontpage .container h3 {
+.container-fluid .frontpage h3 {
   text-align: center;
   color: white;
   padding: 1vh;
@@ -50,7 +56,7 @@ body {
   font-size: 150%;
 }
 
-.frontpage .container form {
+.container-fluid .frontpage form {
   padding: 3vh;
   padding-bottom: 20px;
 }
@@ -80,31 +86,13 @@ body {
     color: white;
 }
 
-.movie_details {
-    background-image: url("../images/75pcblack.png");
-    border-radius: 5px;
+.movie-details {
     padding: 0px 20px;
-    margin: 25px 0px;
-    color: white;
+    margin: 10px 0px;
 }
 
-.movie_details a {
-    color: rgb(180, 240, 241);
-}
-
-.movie_details div {
-    padding-top: 5px;
-}
-
-.movie_details .review_content {
-    color: black;
-    border-radius: 5px;
-    padding: 15px;
-    margin: 15px 5px;
-}
-
-.movie_details .review_content a {
-    color: blue;
+.movie-details .content, fieldset, .movie-details h4 {
+  font-family: "Source Sans Pro";
 }
 
 .movie_poster {
@@ -114,18 +102,17 @@ body {
     margin: 25px 0px;
 }
 
-.heading {
+legend {
+  font-family: "Oxygen";
   font-weight: bold;
-  display: inline;
+  display: block;
   padding-right: 20px;
+  margin-bottom: 5px;
+  font-size: medium;
 }
 
 .content {
   display: inline;
-}
-
-.synopsis {
-  text-align: justify;
 }
 
 .carousel-inner { 
@@ -136,7 +123,7 @@ body {
   display: inline-block;
 }
 
-.carousel-caption {
+.carousel-caption, .movie_details, .container-fluid .jumbotron .row {
   background-image: url("../images/75pcblack.png");
 }
 
@@ -144,11 +131,6 @@ body {
   padding: 1rem;
   background-color: #f4f4f4;
   text-align: center;
-}
-
-legend {
-  margin-bottom: 5px;
-  font-size: large;
 }
 
 fieldset {
@@ -164,4 +146,45 @@ fieldset label {
   color: white;
   border-radius: 2px;
   font-weight: normal;
+}
+
+.recommendation-poster {
+  padding: 10px;
+  text-align: center;
+}
+
+.recommendation-details {
+  padding: 10px;
+}
+
+.recommendation-details .genre-buttons {
+  text-align: center;
+}
+
+.recommendation-details .genre-buttons .btn {
+  margin: 2px 1px;
+  padding: 4px 6px;
+}
+
+.recommendation-details p {
+  text-align: justify;
+}
+
+.movie-title-search {
+  margin: 30px 5px 5px 5px;
+}
+
+.ui-autocomplete {
+  max-height: 100px;
+  overflow-y: auto;
+  /* prevent horizontal scrollbar */
+  overflow-x: hidden;
+}
+
+.movie-poster {
+  text-align: center;
+}
+
+.movie-header {
+  margin: 30px 0px;
 }
