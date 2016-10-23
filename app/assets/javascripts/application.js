@@ -10,8 +10,11 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require jquery
-//= require jquery_ujs
 //= require_tree .
+//= require js-routes
+//= require jquery-3.1.1
+//= require jquery-ui
 //= require owl.carousel
+//= require bootstrap
+//= require ie10-viewport-bug-workaround
 //= require turbolinks

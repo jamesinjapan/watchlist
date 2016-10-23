@@ -1,3 +1,6 @@
+<%= javascript_tag do %>
+  var movietitlelookup_path = '<%= search_movietitleremote_path %>';
+<% end %>
 <form action="<%= search_movietitlelookup_path %>" method="get" id="movie-lookup-form">
   <div class="input-group ui-widget">
     <%= text_field_tag :t, params[:t], :class => "form-control", :id => "movie-title-lookup", :placeholder => "Enter a movie title..." %>

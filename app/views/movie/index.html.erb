@@ -1,6 +1,8 @@
+<% ml_m = MovielensMovie.joins(:movielens_tags, :movielens_ratings).find_by tmdb: @m["id"] %>
+
 <div class="container-fluid">
   <% if @m["backdrop_path"] != nil %>
-    <div class="jumbotron" style="background-image: url('https://image.tmdb.org/t/p/original<%= @m["backdrop_path"] %>'); border-radius:0px;" >
+    <div class="jumbotron" style="background-image: url('<%= TMDB_IMG_BASE + TMDB_BACKDROP_SIZES.last + @m["backdrop_path"] %>'); border-radius:0px;" >
       <div class="row">
         <div class="col-xs-12 movie-title-search"> 
           <%= render partial: "shared/movie_title_lookup" %>
@@ -21,72 +23,114 @@
     </div>
   <% end %>
 </div>
-<div class="container-fluid">
-  <div class="container">
-    <div class="row">
-      <div class="col-xs-12 col-sm-6">
-        <%= image_tag "https://image.tmdb.org/t/p/w600" + @m["poster_path"], :class => "img-responsive movie-poster", :alt =>  "#{@m["title"]} #{@m["release_date"]}" %>
-      </div>
-      <div class="col-xs-6 col-sm-3 movie-details">
-        <legend>Release date</legend>
-        <div class="content"><%= @m["release_date"] %></div>
-      </div>
-      <div class="col-xs-6 col-sm-3 movie-details">
-        <legend>Runtime</legend>
-        <div class="content"><%= @m["runtime"] %> minutes</div>
-      </div>
-      <div class="col-xs-12 col-sm-6 movie-details">
-        <legend>Synopsis</legend>
-        <div class="content"><%= @m["overview"] %></div>
-      </div>
-      <% if @m["reviews"]["results"][0] != nil %>
-        <div class="col-xs-12 col-sm-6 movie-details">
-          <% review = @m["reviews"]["results"].shuffle[0] %>
-          <legend>Review by <%=review["author"] %> (via TMDb)</legend>
-          <div class="content"><%= raw truncate(review["content"], :length => 1500, :separator => ' ') + " " %><%= link_to "(read more)" , review["url"] %></div>
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-sm-6">
+      <%= image_tag TMDB_IMG_BASE + TMDB_POSTER_SIZES[4] + @m["poster_path"], :class => "img-responsive movie-poster", :alt =>  "#{@m["title"]} #{@m["release_date"]}" %>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+      <div class="row">
+        <div class="col-xs-4 movie-details">
+          <legend>Release date</legend>
+          <div class="content"><%= @m["release_date"] %></div>
         </div>
-      <% end %>
-      <div class="col-xs-12 col-sm-6 movie-details">
-        <h4>Search for new recommendations by selecting genres or keywords below:</h4>
-        <form action="<%= recommendation_index_path %>" method="get" id="recommendation-filter-form">
-          <fieldset>
-            <legend>Genres: </legend>
-            <% @m["genres"].each_with_index do |v,i| %>
-                <label for="checkbox-genres-<%= i %>"><%= v["name"] %>
-                  <%= check_box_tag "g[]", v["id"], false, :class => 'checkbox-genres' %>
-                </label>
+        <div class="col-xs-4 movie-details">
+          <legend>Rating</legend>
+          <div class="content">
+            <% if @m["releases"]["countries"] == nil %>
+              N/A
+            <% elsif @m["releases"]["countries"][0]["iso_3166_1"] != "US" %>
+              <%= @m["releases"]["countries"][0]["certification"] + "(" + @m["releases"]["countries"][0]["iso_3166_1"] + ")" %>
+            <% else %>
+              <%= @m["releases"]["countries"][0]["certification"] %>
             <% end %>
-          </fieldset>
-          <fieldset>
-            <legend>Keywords: </legend>
-            <% @m["keywords"]["keywords"].each_with_index do |v,i| %>
-              <label for="checkbox-keywords-<%= i %>"><%= v["name"] %>
-                <%= check_box_tag "k[]", v["id"], false, :class => 'checkbox-keywords' %>
+          </div>
+        </div>
+        <div class="col-xs-4 movie-details">
+          <legend>Runtime</legend>
+          <div class="content"><%= @m["runtime"] %> minutes</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-4 movie-details">
+          <legend>Country</legend>
+          <div class="content"><%= @i["Country"] %></div>
+        </div>
+        <div class="col-xs-8 movie-details">
+          <legend>Awards</legend>
+          <div class="content"><%= @i["Awards"] %></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-6 movie-details">
+          <legend>Average User Rating</legend>
+          <div class="content"><%= ml_m == nil ? "N/A" : ml_m.movielens_ratings.average(:rating).to_f.round(1).inspect %></div>
+        </div>
+        <div class="col-xs-6 movie-details">
+          <legend>Total User Ratings</legend>
+          <div class="content"><%= ml_m == nil ? "N/A" : ml_m.movielens_ratings.count.inspect %></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 movie-details">
+          <legend>Synopsis</legend>
+          <div class="content"><%= @m["overview"] %></div>
+        </div>
+        <% if @m["reviews"]["results"][0] != nil %>
+          <div class="col-xs-12 movie-details">
+            <% review = @m["reviews"]["results"].shuffle[0] %>
+            <legend>Review by <%=review["author"] %> (via TMDb)</legend>
+            <div class="content"><%= raw truncate(review["content"], :length => 1500, :separator => ' ') + " " %><%= link_to "(read more)" , review["url"] %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 movie-details">
+      <h4>Search for new recommendations by selecting genres or keywords below:</h4>
+      <form action="<%= recommendation_index_path %>" method="get" id="recommendation-filter-form">
+        <fieldset>
+          <legend>Genres: </legend>
+          <% @m["genres"].each_with_index do |v,i| %>
+              <label for="checkbox-genres-<%= i %>"><%= v["name"] %>
+                <%= check_box_tag "g[]", v["id"], false, :class => 'checkbox-genres' %>
+              </label>
+          <% end %>
+        </fieldset>
+        <fieldset>
+          <legend>Keywords: </legend>
+          <% @m["keywords"]["keywords"].each_with_index do |v,i| %>
+            <label for="checkbox-keywords-<%= i %>"><%= v["name"] %>
+              <%= check_box_tag "k[]", v["id"], false, :class => 'checkbox-keywords' %>
+            </label>
+          <% end %>
+        </fieldset>
+        <fieldset>
+          <legend>Additional Keywords: </legend>
+          <% if ml_m != nil %>
+            <% ml_m.movielens_tags.order(:tag).pluck(:tag).uniq.each_with_index do |v,i| %>
+              <label for="checkbox-keywords-<%= i %>"><%= v.encode!('UTF-8', 'UTF-8', :invalid => :replace) %>
+                <%= check_box_tag "ak[]", v, false, :class => 'checkbox-keywords' %>
               </label>
             <% end %>
-          </fieldset>
-          <%= hidden_field_tag :m, @m["id"], :id => "movie-id" %>
-          <%= submit_tag "Get new recommendations", :class => "btn btn-primary", :name => nil %>
-        </form>
-      </div>
+          <% end %>
+        </fieldset>
+        <%= hidden_field_tag :m, @m["id"], :id => "movie-id" %>
+        <%= submit_tag "Get new recommendations", :class => "btn btn-primary", :name => nil %>
+      </form>
     </div>
-    <div class="col-xs-12 movie details">
-      <h4>People who liked <%= @m["title"] %> also liked:</h4>
-    </div>
+  </div>
+  <div class="col-xs-12 movie details">
+    <h4>People who liked <%= @m["title"] %> also liked:</h4>
   </div>
 </div>
 <div class="container-fluid">
   <div class="owl-carousel">
     <% @tmdb_recommends.each_with_index do |v,i| %>
       <div>
-        <%= link_to image_tag("https://image.tmdb.org/t/p/w600" + v["poster_path"], :class => "img-responsive", :alt =>  "#{v["title"]} #{v["release_date"]}"), movie_index_path(:m => v["id"]) %>
+        <%= link_to image_tag(TMDB_IMG_BASE + TMDB_POSTER_SIZES[4] + v["poster_path"], :class => "img-responsive", :alt =>  "#{v["title"]} #{v["release_date"]}"), movie_index_path(:m => v["id"]) %>
       </div>
     <% end %>
   </div>
 </div>
-
-<% ml_m = MovielensMovie.joins(:movielens_tags, :movielens_ratings).find_by tmdb: @m["id"] %>
-<%= ml_m.inspect %>
-<%= ml_m.movielens_tags.pluck(:tag).uniq.inspect if ml_m != nil %>
-<%= ml_m.movielens_ratings.average(:rating).to_f.round(1).inspect if ml_m != nil %>
-

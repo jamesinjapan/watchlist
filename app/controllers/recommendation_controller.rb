@@ -11,16 +11,21 @@ class RecommendationController < ApplicationController
     @current_movie = params[:m] if params[:m].present?
     
     @recommendation_list = []
-    @genre_list = []
-    
-    url = "https://api.themoviedb.org/3/genre/movie/list?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US"
+
+    url = "https://api.themoviedb.org/3/discover/movie?api_key=" + TMDB_API_KEY + "&language=en-US&sort_by=popularity.desc&page=1"
+    url = url + "&with_genres=" + @genres.join(",") if @genres != nil 
+    url = url + "&with_keywords=" + @keywords.join(",") if @keywords != nil 
     uri = URI(url) 
     response = Net::HTTP.get(uri)
     results = JSON.parse(response) 
-    @genre_list = results["genres"]
-    
+    @disc = results["results"]
+    results["results"].each do |v|
+      v["source"] = "discovery"
+      @recommendation_list.push(v.slice("id","title","release_date","poster_path","genre_ids", "vote_count", "source", "popularity", "overview"))
+    end
+
     if @genres != nil 
-      url = "https://api.themoviedb.org/3/genre/" + @genres.join("+") + "/movies?api_key=553017e076c2ecd01b7bf9cdd20a6360"
+      url = "https://api.themoviedb.org/3/genre/" + @genres.join("+") + "/movies?api_key=" + TMDB_API_KEY
       uri = URI(url) 
       response = Net::HTTP.get(uri)
       results = JSON.parse(response) 
@@ -31,7 +36,7 @@ class RecommendationController < ApplicationController
     end
     
     if @keywords != nil 
-      url = "https://api.themoviedb.org/3/keyword/" + @keywords.join("+") + "/movies?api_key=553017e076c2ecd01b7bf9cdd20a6360"
+      url = "https://api.themoviedb.org/3/keyword/" + @keywords.join("+") + "/movies?api_key=" + TMDB_API_KEY
       uri = URI(url) 
       response = Net::HTTP.get(uri)
       results = JSON.parse(response) 
@@ -40,13 +45,12 @@ class RecommendationController < ApplicationController
         @recommendation_list.push(v.slice("id","title","release_date","poster_path","genre_ids", "vote_count", "source", "popularity", "overview"))
       end
     end
-    
+
     @recommendation_list.delete_if { |v| v["poster_path"] == nil } 
     @recommendation_list.delete_if { |v| v["id"].to_s == @current_movie.to_s } 
-    @recommendation_list.delete_if { |v| v["vote_count"] < 11 } 
-    @recommendation_list.delete_if { |x| (@genres - x["genre_ids"].map { |v| v.to_s}).count == @genres.count } 
+    @recommendation_list.delete_if { |x| (@genres - x["genre_ids"].map { |v| v.to_s}).count == @genres.count } if @genres != nil 
     @recommendation_list.uniq! { |v| v["id"] }
     @recommendation_list.sort! { |x,y| y["popularity"] <=> x["popularity"] }
-    @recommendation_list.sort! { |x,y| (@genres - x["genre_ids"].map { |v| v.to_s}).count <=> (@genres - y["genre_ids"].map { |v| v.to_s}).count }
+    @recommendation_list.sort! { |x,y| (@genres - x["genre_ids"].map { |v| v.to_s}).count <=> (@genres - y["genre_ids"].map { |v| v.to_s}).count } if @genres != nil 
   end
 end

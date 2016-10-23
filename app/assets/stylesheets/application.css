@@ -12,5 +12,12 @@
  *
  *= require_tree .
  *= require_self
+ *= require bootstrap
+ *= require jquery-ui
  *= require owl.carousel
+ *= require ie10-viewport-bug-workaround
+ *= require jquery-ui
+ *= require theme
+ *= require owl.carousel
+ *= require styles
 */

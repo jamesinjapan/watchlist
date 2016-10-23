@@ -7,13 +7,19 @@ class MovieController < ApplicationController
     @movie_id = params[:m]
     
     # Get JSON data from tmdb
-    url = "https://api.themoviedb.org/3/movie/" + @movie_id + "?api_key=553017e076c2ecd01b7bf9cdd20a6360&append_to_response=keywords,credits,recommendations,similar,reviews"
+    url = "https://api.themoviedb.org/3/movie/" + @movie_id + "?api_key=" + TMDB_API_KEY + "&append_to_response=keywords,credits,recommendations,similar,reviews,releases"
     uri = URI(url) 
     response = Net::HTTP.get(uri)
     @m = JSON.parse(response) 
     
     # Prepare plus sign glyphicon span
     @glyphicon_plus = "<span class='glyphicon glyphicon-plus' aria-hidden='true'></span> "
+    
+    # Get JSON data from tmdb
+    url = "https://www.omdbapi.com/?i=" + @m["imdb_id"]
+    uri = URI(url) 
+    response = Net::HTTP.get(uri)
+    @i = JSON.parse(response) 
     
     # Prepare poster array
     @tmdb_recommends = @m["recommendations"]["results"] + @m["similar"]["results"]

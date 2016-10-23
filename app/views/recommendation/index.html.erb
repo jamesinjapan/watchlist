@@ -15,7 +15,7 @@
         <% if r["poster_path"] == nil %>
           <%= link_to image_tag('noposter'), movie_index_path(:m => r["id"])  %>
         <% else %>
-          <%= link_to image_tag("https://image.tmdb.org/t/p/w154" + r["poster_path"]), movie_index_path(:m => r["id"]) %>
+          <%= link_to image_tag(TMDB_IMG_BASE + TMDB_POSTER_SIZES[3] + r["poster_path"], :class => "img-responsive"), movie_index_path(:m => r["id"]) %>
         <% end %>
       </div>
       <div class="col-xs-12 col-sm-8 col-lg-4 recommendation-details">
@@ -27,7 +27,7 @@
         <p><%= r["overview"] %></p>
         <div class="col-xs-12 genre-buttons">
           <% r["genre_ids"].each { |v| %>
-            <% g = @genre_list.find { |x| x["id"] == v } %>
+            <% g = TMDB_GENRE_LIST.find { |x| x["id"] == v } %>
             <%= button_tag g["name"], :class => "btn btn-primary" if g != nil %>
           <% } %>
         </div>

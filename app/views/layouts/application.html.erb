@@ -4,31 +4,22 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0;">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="/images/favicon.ico">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="A movie recommendation site">
+    <meta name="author" content="James Simpson">
+    
     <title>WatchList: What will you watch next?</title>
-
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-
-    <!-- Custom styles for this template -->
-    <link href="/css/styles.css" rel="stylesheet">
+    <%= favicon_link_tag "favicon.ico" %>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Oxygen|Source+Sans+Pro" rel="stylesheet"> 
+    <%= stylesheet_link_tag "bootstrap.css", media: "all" %>
+    <%= stylesheet_link_tag "ie10-viewport-bug-workaround.css", media: "all" %>
+    <%= stylesheet_link_tag "jquery-ui.css", media: "all" %>
+    <%= stylesheet_link_tag "theme.css", media: "all" %>
+    <%= stylesheet_link_tag "owl.carousel.css", media: "all" %>
+    <%= stylesheet_link_tag "styles.css", media: "all" %>
+    <%= stylesheet_link_tag "https://fonts.googleapis.com/css?family=Oxygen|Source+Sans+Pro", media: "all" %>
     
-    <!-- JQuery UI -->
-    <link href="/css/jquery-ui.css" rel="stylesheet">
-    
-    <!-- Owl Carousel -->
-    <link href="/css/owl.carousel.css" rel="stylesheet">
+    <%= javascript_include_tag "jquery-3.1.1.js" %>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -41,83 +32,13 @@
     <%= render partial: "shared/nav" %>
     <%= yield %>
     <%= render partial: "shared/footer" %>
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="/js/ie10-viewport-bug-workaround.js"></script>
-    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-    <script src="/js/owl.carousel.js"></script>
-    
-    <!-- JQueryUI Autocomplete -->
-    <script>
-      $(document).ready( function() {
-        $(function() {
-          $( '#movie-title-lookup' ).autocomplete({
-            source: function(request, response){
-                remoteResults = $.ajax({
-                url: '<%= search_movietitleremote_path %>',
-                dataType: "json",
-                data: { t: request.term },
-                success: function( data ) {
-                  response( $.map( data, function( item ) {
-                    return { 
-                      label: item.label,
-                      value: item.value,
-                    };   
-                  }));
-                }
-              });
-              
-            },
-            minLength: 3,
-            focus: function(event, ui) {
-              $(this).val(ui.item.label);
-              return false;
-            },
-            select: function(event, ui) {
-              $('#movie-id').val(ui.item.value);
-              $(this).val(ui.item.label);
-              $("#movie-lookup-form").submit();
-              return false;
-            },
-            _resizeMenu: function () {
-              var ul = this.menu.element;
-              ul.outerWidth(this.element.outerWidth());
-            }
-          });
-        });
-      });  
-    </script>
-    
-    <!-- Owl Carousel -->
-    <script>
-    $(document).ready(function() {
 
-      $(".owl-carousel").owlCarousel({
-        loop: true,
-        margin: 0,
-        nav: false,
-        center: true,
-        autoHeight: true,
-        lazyLoad: true,
-        autoplay: true,
-        autoplayHoverPause: true,
-        responsive:{
-            0:{
-                items:1
-            },
-            600:{
-                items:2
-            },
-            1000:{
-                items:4
-            }
-        }
-      });
-    });
-    </script>
-</body>
+
+    <%= javascript_include_tag "jquery-ui.js" %>
+    <%= javascript_include_tag "owl.carousel.js" %>
+    <%= javascript_include_tag "movietitlelookup.js" %>
+    <%= javascript_include_tag "postercarousel.js" %>
+    <%= javascript_include_tag "bootstrap.js" %>
+    <%= javascript_include_tag "ie10-viewport-bug-workaround.js" %>
+  </body>
 </html>
