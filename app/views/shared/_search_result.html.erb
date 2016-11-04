@@ -1,0 +1,14 @@
+<div class="col-xs-6 col-sm-6 col-md-4 col-lg-3 search-result">
+  <% if r["release_date"][0..3] == "" %>
+    <%= link_to r["title"], movie_index_path(:m => r["id"]), :class => "search-title" %>
+  <% else %>
+    <%= link_to r["title"] + " (" + r["release_date"][0..3] + ")", movie_index_path(:m => r["id"]), :class => "search-title" %>
+  <% end %>
+  <div class="col-xs-12 search-poster">
+    <% if r["poster_path"] == nil %>
+      <%= link_to image_tag('noposter.png', :class => "img-responsive"), movie_index_path(:m => r["id"])  %>
+    <% else %>
+      <%= link_to image_tag(TMDB_IMG_BASE + TMDB_POSTER_SIZES[3] + r["poster_path"], :class => "img-responsive"), movie_index_path(:m => r["id"]) %>
+    <% end %>
+  </div>
+</div>

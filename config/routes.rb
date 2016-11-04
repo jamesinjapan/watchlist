@@ -1,8 +1,12 @@
 Rails.application.routes.draw do
+  devise_for :users
+
   get 'recommendation/index'
 
   get 'movie/index'
   post 'movie/index'
+  
+  get 'movie/submit-rating' => 'movie#submitRating'
 
   get 'search/index'
   post 'search/index'

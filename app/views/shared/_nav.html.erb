@@ -1,5 +1,5 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
-  <div class="container">
+  <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
         <span class="sr-only">Toggle navigation</span>
@@ -7,18 +7,49 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/">WatchList</a>
+      <a class="navbar-brand" href="/"><%= image_tag image_path("watchlistlogo.png"), :alt => "WatchList Logo" %></a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
-      <form class="navbar-form navbar-right">
-        <div class="form-group">
-          <input type="text" placeholder="Email" class="form-control">
-        </div>
-        <div class="form-group">
-          <input type="password" placeholder="Password" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-success">Sign in</button>
-      </form>
-    </div><!--/.navbar-collapse -->
-   </div>
+      <ul class="nav navbar-nav navbar-right">
+        <% if user_signed_in? %>
+          <li class="navbar-text">Signed in as <%= current_user.username %></li>
+          <li class="navbar-text"><%= button_to "Sign out", destroy_user_session_path, class: "btn btn-danger", method: :delete %></li>
+        <% else %>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Already have an account? <b>Sign in</b> <span class="caret"></span></a>
+            <ul id="nav-login" class="dropdown-menu">
+              <li>
+                <div class="row">
+                  <div class="col-md-12">
+                    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+                      <div class="form-group">
+                        <%= f.email_field :email, :class => "form-control", :placeholder => "Email" %>
+                      </div>
+                      <div class="form-group">
+                        <%= f.password_field :password, :class => "form-control", :placeholder => "Password" %>
+                      </div>
+                      
+                      <div class="actions">
+                        <%= f.submit "Sign in", :class => "btn btn-primary pull-right" %>
+                      </div>
+                    
+                      <% if devise_mapping.rememberable? -%>
+                        <div class="field">
+                          <%= f.check_box :remember_me %>
+                          <%= f.label :remember_me %>
+                        </div>
+                      <% end -%>
+                
+                    <% end %>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </li>
+          <li class="dropdown"><%= link_to raw("No account? <b>Sign up</b>"), new_user_registration_path, class: "dropdown-toggle" %></li>
+        <% end %>
+      </ul>
+    </div>
+    <!--/.navbar-collapse -->
+  </div>
 </nav>

@@ -1,4 +1,4 @@
-<p class="search_pages">
+<p class="search-pages">
   <% if lowest_page != 1 %>
     <%= link_to "<<", url_for(params.merge(:p => "1")) if lowest_page > 2 %>
     <%= "  " if lowest_page > 2 %>

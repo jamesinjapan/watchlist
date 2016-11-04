@@ -16,8 +16,9 @@
     <%= stylesheet_link_tag "jquery-ui.css", media: "all" %>
     <%= stylesheet_link_tag "theme.css", media: "all" %>
     <%= stylesheet_link_tag "owl.carousel.css", media: "all" %>
-    <%= stylesheet_link_tag "styles.css", media: "all" %>
     <%= stylesheet_link_tag "https://fonts.googleapis.com/css?family=Oxygen|Source+Sans+Pro", media: "all" %>
+    <%= stylesheet_link_tag "https://fonts.googleapis.com/icon?family=Material+Icons", media: "all" %>
+    <%= stylesheet_link_tag "styles.css", media: "all" %>
     
     <%= javascript_include_tag "jquery-3.1.1.js" %>
 
@@ -30,6 +31,12 @@
 
   <body>
     <%= render partial: "shared/nav" %>
+    <% if notice != nil %>
+      <p class="alert-success"><%= notice %></p>
+    <% end %>
+    <% if alert != nil %>
+      <p class="alert-danger"><%= alert %></p>
+    <% end %>
     <%= yield %>
     <%= render partial: "shared/footer" %>
 

@@ -1,33 +1,24 @@
-<div class="container">
+<div class="container main-body">
   <div class="row">
-    <div class="col-xs-12 movie-title-search"> 
+    <div class="col-xs-10 col-xs-offset-1 movie-title-search"> 
       <%= render partial: "shared/movie_title_lookup" %>
     </div>
   </div>
-  <h1>Searching for "<%= params[:t] %>"</h1>
-  <p>Page <%= @results["page"] %> of <%= @results["total_pages"] %> (Total number of results: <%= @results["total_results"] %>)</p>
-  <%= render partial: "shared/search_pages", locals: {current_page: @current_page, lowest_page: @lowest_page, highest_page: @highest_page, total_pages: @total_pages} %>
-  <div class="row row-eq-height">
-    <% @results["results"].each_with_index { |r, i| %>
-      <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3 search_result">
-        <div class="row">
-          <div class="col-xs-12">
-            <% if r["poster_path"] == nil %>
-              <%= link_to image_tag('noposter.jpg'), movie_index_path(:m => r["id"])  %>
-            <% else %>
-              <%= link_to image_tag(TMDB_IMG_BASE + TMDB_POSTER_SIZES[3] + r["poster_path"], :class => "img-responsive"), movie_index_path(:m => r["id"]) %>
-            <% end %>
-          </div>
-          <div class="col-xs-12">
-            <% if r["release_date"][0..3] == "" %>
-              <%= link_to r["title"], movie_index_path(:m => r["id"]) %>
-            <% else %>
-              <%= link_to r["title"] + " (" + r["release_date"][0..3] + ")", movie_index_path(:m => r["id"]) %>
-            <% end %>
-          </div>
-        </div>
-      </div>
-    <% } %>
+  <div class="row">
+    <div class="col-xs-12 page-title">
+      <h1>Searching for "<%= params[:t] %>"</h1>
+      <p>Page <%= @results["page"] %> of <%= @results["total_pages"] %> (Total number of results: <%= @results["total_results"] %>)</p>
+      <%= render partial: "shared/search_pages", locals: {current_page: @current_page, lowest_page: @lowest_page, highest_page: @highest_page, total_pages: @total_pages} %>
+    </div>
+    <div class="col-xs-12">
+      <div class="row row-eq-height">
+      <% @results["results"].each_with_index { |r, i| %>
+        <%= render partial: "shared/search_result", locals: {r: r, i: i} %>
+      <% } %>
+    </div>
+    </div>
+    <div class="col-xs-12 search-page-title">
+      <%= render partial: "shared/search_pages", locals: {current_page: @current_page, lowest_page: @lowest_page, highest_page: @highest_page, total_pages: @total_pages} %>
+    </div>
   </div>
-  <%= render partial: "shared/search_pages", locals: {current_page: @current_page, lowest_page: @lowest_page, highest_page: @highest_page, total_pages: @total_pages} %>
 </div>

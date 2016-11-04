@@ -11,32 +11,65 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161022044337) do
+ActiveRecord::Schema.define(version: 20161103082556) do
 
-  create_table "movielens_movies", force: :cascade do |t|
+  create_table "movies", force: :cascade do |t|
     t.string "title"
     t.string "genres"
     t.string "imdb"
     t.string "tmdb"
   end
 
-  add_index "movielens_movies", ["imdb"], name: "imdb_ix"
-  add_index "movielens_movies", ["title"], name: "title_ix"
-  add_index "movielens_movies", ["tmdb"], name: "tmdb_ix"
+  add_index "movies", ["imdb"], name: "imdb_ix"
+  add_index "movies", ["title"], name: "title_ix"
+  add_index "movies", ["tmdb"], name: "tmdb_ix"
 
-  create_table "movielens_ratings", force: :cascade do |t|
+  create_table "old_users", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "password_digest"
+  end
+
+  create_table "ratings", force: :cascade do |t|
     t.string  "rating"
-    t.integer "movielens_movie_id"
+    t.integer "movie_id"
+    t.integer "user_id"
   end
 
-  add_index "movielens_ratings", ["movielens_movie_id"], name: "index_movielens_ratings_on_movielens_movie_id"
+  add_index "ratings", ["movie_id"], name: "index_ratings_on_movie_id"
+  add_index "ratings", ["user_id"], name: "index_ratings_on_user_id"
 
-  create_table "movielens_tags", force: :cascade do |t|
-    t.string  "tag"
-    t.integer "movielens_movie_id"
+  create_table "tag_keys", force: :cascade do |t|
+    t.string "tag_text"
   end
 
-  add_index "movielens_tags", ["movielens_movie_id"], name: "index_movielens_tags_on_movielens_movie_id"
-  add_index "movielens_tags", ["tag"], name: "tag_ix"
+  create_table "tags", force: :cascade do |t|
+    t.integer "tag_key_id"
+    t.integer "user_id"
+    t.integer "movie_id"
+  end
+
+  add_index "tags", ["movie_id"], name: "index_tags_on_movie_id"
+  add_index "tags", ["tag_key_id"], name: "index_tags_on_tag_key_id"
+  add_index "tags", ["user_id"], name: "index_tags_on_user_id"
+
+  create_table "users", force: :cascade do |t|
+    t.string   "username"
+    t.string   "email",                  default: "", null: false
+    t.string   "encrypted_password",     default: "", null: false
+    t.string   "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",          default: 0,  null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+  end
+
+  add_index "users", ["username"], name: "index_users_on_username", unique: true
+
+# Could not dump table "users_bk" because of following NoMethodError
+#   undefined method `[]' for nil:NilClass
 
 end

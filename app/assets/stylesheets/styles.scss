@@ -1,0 +1,358 @@
+// APPLICATION STYLES
+
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+  overflow-x: hidden;
+  color: white;
+  background-color: #232323;
+}
+
+input {
+  color: #232323;
+}
+
+.alert-success, .alert-danger, .alert-warning, .alert-info {
+  padding: 20px;
+}
+
+.container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.container {
+  background-color: #22313A;
+}  
+
+.main-body {
+  border-left: black 1px solid;
+  border-right: black 1px solid;
+}
+
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: space-between;
+}
+
+.jumbotron {
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: center 25%;
+    margin-bottom: 0px;
+    margin-top: -20px;
+}
+
+.btn-primary {
+  background-color: #629ABA;
+}
+
+.dark-overlay {
+  background-image: image-url("75pcblack.png");
+  background-repeat: repeat;
+}
+
+.page-title {
+  background-color: #232323;
+  border-top: black 1px solid;
+  border-bottom: black 1px solid;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+// NAVBAR STYLES
+
+.navbar {
+  color: white;
+  background-color: #22313A;
+}
+
+.navbar-header {
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+}
+
+.navbar-toggle {
+  margin-right: 0px !important;
+  clear: left;
+}
+
+.navbar-brand {
+  max-width: 80%;
+  padding: 0px;
+  margin-top: 2px;
+  margin-right: 0px;
+  margin-bottom: 0px !important;
+  margin-left: 0px !important;
+}
+
+.navbar-brand img {
+  height:50px;
+  width: 241px;
+}
+
+.navbar-right {
+  margin-right: 0px !important;
+}
+
+.navbar-right .navbar-text {
+  max-height: 50px;
+  margin: 15px;
+}
+
+.navbar-right .navbar-text .btn-danger {
+  margin-top: -4px;
+  padding: 3px 15px;
+}
+
+.navbar-right .dropdown a {
+  text-align: center;
+  color: white !important;
+}
+
+.navbar-right .dropdown a:hover {
+  color: #629ABA !important;
+}
+
+.dropdown-menu {
+  padding: 20px;
+  background-color: #232323;
+  width: 100%;
+}
+
+.navbar-nav li.open a {
+  background-color: #232323 !important;
+  border-bottom: black 1px solid !important;
+}
+
+// FOOTER STYLES
+
+.footer {
+  padding: 1%;
+  background-color: #22313A;
+  text-align: justify;
+  border-top: black 1px solid;
+}
+
+// WELCOME STYLES
+
+.container-fluid .frontpage .row {
+  padding-bottom: 5vh;
+}
+
+.container-fluid .jumbotron .row {
+  color: white;
+  margin: auto;
+  border-radius: 15px;
+  padding: 10px;
+}
+
+.container-fluid .frontpage h1 {
+  font-size: 250%;
+  text-align: center;
+  color: white;
+  font-weight: 600;
+  padding: 1vh;
+  padding-bottom: 20px;
+  font-family: "Oxygen";
+}
+
+.container-fluid .frontpage p {
+  text-align: justify;
+  color: white;
+  padding: 20px;
+  font-family: "Oxygen";
+  font-size: 130%;
+}
+
+.container-fluid .frontpage h3 {
+  text-align: center;
+  color: white;
+  padding: 1vh;
+  font-family: "Oxygen";
+  font-size: 150%;
+}
+
+.container-fluid .frontpage form {
+  padding: 3vh;
+  padding-bottom: 20px;
+}
+
+// MOVIE STYLES
+
+.movie-header small {
+  color: #629ABA;
+}
+
+.movie-sheet {
+  color: white;
+}
+
+.movie-poster-div {
+  padding: 0px;
+  order: 0;
+  flex-shrink: 1;
+  margin-left: -5px;
+  margin-top: 10px;
+}
+
+.movie-details-div {
+  order: 1;
+  flex-grow: 1;
+  flex-basis: 50%;
+  padding: 0 10px;
+}
+
+.movie-details .content, fieldset, .movie-details h4 {
+  font-family: "Source Sans Pro";
+}
+
+legend {
+  font-family: "Oxygen";
+  font-weight: bold;
+  display: block;
+  padding-right: 20px;
+  margin-bottom: 5px;
+  font-size: medium;
+  color: #629ABA;
+  border-bottom: 1px solid #629ABA;
+}
+
+.rating-radio {
+  padding: 0 5px;
+}
+
+.rating-radio input[type="radio"] {
+  visibility: hidden;
+  height: 0;
+  width: 0;
+  margin: 0;
+}
+
+.rating-radio label {
+  width: 100%;
+  margin: 0;
+  padding: 10px;
+  border-radius: 25px;
+}
+
+.rating-radio input[type="radio"]:checked + label {
+  background-color: #3C5968;
+}
+
+.material-icons, .icon-text {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.movie-details {
+    padding: 0px 20px;
+    margin: 10px 0px;
+}
+
+fieldset {
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+fieldset label {
+  border: 1px black solid;
+  background-color: #337ab7;
+  padding: 5px;
+  color: white;
+  border-radius: 2px;
+  font-weight: normal;
+}
+
+
+// SEARCH STYLES
+
+.search-result {
+    padding: 10px;
+    text-align: center;
+}
+
+.search-title {
+  display: block;
+  background-color: #232323;
+  color: white;
+  border-radius: 5px 5px 0px 0px;
+  border: white solid 1px;
+  border-bottom: none;
+  padding: 5px;
+  font-weight: 600;
+}
+
+// SEARCH PAGE LINKS PARTIAL STYLES
+
+.search-pages {
+    text-align: center;
+    background-color: #232323;
+    color: white;
+    margin: 20px 0px;
+    width: 100%;
+}
+
+.search-pages a {
+    text-decoration: none;
+    color: #629ABA;
+}
+
+.search-poster {
+  padding: 0;
+  border: white solid 1px;
+  border-top: none;
+}
+
+// MOVIE LOOKUP PARTIAL STYLES 
+
+#movie-lookup-form .form-control {
+  border-radius: 4px 0px 0px 4px;
+}
+
+.movie-title-search {
+ padding: 20px 0;
+ margin-top: 10px;
+}
+
+#movie-lookup-form .input-group-btn .btn {
+  font-size: 14px;
+}
+
+.ui-autocomplete {
+  max-height: 145px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+
+// RECOMMENDATION STYLES
+
+.recommendation-poster {
+  padding: 10px;
+  text-align: center;
+}
+
+.recommendation-details {
+  padding: 10px;
+}
+
+.recommendation-details .genre-buttons {
+  text-align: center;
+}
+
+.recommendation-details .genre-buttons .btn {
+  margin: 2px 1px;
+  padding: 4px 6px;
+}
+
+.recommendation-details p {
+  text-align: justify;
+}
+

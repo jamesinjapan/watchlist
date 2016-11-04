@@ -1,10 +1,8 @@
-<% ml_m = MovielensMovie.joins(:movielens_tags, :movielens_ratings).find_by tmdb: @m["id"] %>
-
-<div class="container-fluid">
-  <% if @m["backdrop_path"] != nil %>
+<% if @m["backdrop_path"] != nil %><div class="container-fluid">
+  <div class="container-fluid">
     <div class="jumbotron" style="background-image: url('<%= TMDB_IMG_BASE + TMDB_BACKDROP_SIZES.last + @m["backdrop_path"] %>'); border-radius:0px;" >
-      <div class="row">
-        <div class="col-xs-12 movie-title-search"> 
+      <div class="row dark-overlay">
+        <div class="col-xs-10 col-xs-offset-1 movie-title-search"> 
           <%= render partial: "shared/movie_title_lookup" %>
         </div>
         <div class="col-xs-12">
@@ -12,23 +10,26 @@
         </div>
       </div>
     </div>
-  <% else %>
-    <div class="col-xs-12 page-header">
-      <div class="row">
-        <div class="col-xs-12 movie-title-search"> 
+<% else %>
+  <div class="container main-body">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="col-xs-12 col-xs-offset-1 movie-title-search"> 
           <%= render partial: "shared/movie_title_lookup" %>
         </div>
+        <div class="col-xs-12"> 
+          <h1 class="movie-header"><%= @m["title"] %><%= " (#{@m["original_title"]})" if @m["original_title"] != @m["title"] %><br><small><%= @m["tagline"] %></small></h1>
+        </div>
       </div>
-      <h1 class="movie-header"><%= @m["title"] %><%= " (#{@m["original_title"]})" if @m["original_title"] != @m["title"] %><br><small><%= @m["tagline"] %></small></h1>
     </div>
   <% end %>
 </div>
-<div class="container">
-  <div class="row">
-    <div class="col-xs-12 col-sm-6">
+<div class="container main-body">
+  <div class="movie-sheet row-eq-height">
+    <div class="movie-poster-div text-center">
       <%= image_tag TMDB_IMG_BASE + TMDB_POSTER_SIZES[4] + @m["poster_path"], :class => "img-responsive movie-poster", :alt =>  "#{@m["title"]} #{@m["release_date"]}" %>
     </div>
-    <div class="col-xs-12 col-sm-6">
+    <div class="movie-details-div">
       <div class="row">
         <div class="col-xs-4 movie-details">
           <legend>Release date</legend>
@@ -37,7 +38,9 @@
         <div class="col-xs-4 movie-details">
           <legend>Rating</legend>
           <div class="content">
-            <% if @m["releases"]["countries"] == nil %>
+            <% if @i["Rated"] != nil %>
+              <%= @i["Rated"] %>
+            <% elsif @m["releases"]["countries"] == nil %>
               N/A
             <% elsif @m["releases"]["countries"][0]["iso_3166_1"] != "US" %>
               <%= @m["releases"]["countries"][0]["certification"] + "(" + @m["releases"]["countries"][0]["iso_3166_1"] + ")" %>
@@ -62,13 +65,60 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-6 movie-details">
-          <legend>Average User Rating</legend>
-          <div class="content"><%= ml_m == nil ? "N/A" : ml_m.movielens_ratings.average(:rating).to_f.round(1).inspect %></div>
+        <div class="col-xs-4 movie-details">
+          <legend>User Rating</legend>
+          <div class="content">
+            <% if @current_movie == nil || @current_movie.ratings.empty? %>
+              Not rated yet!
+            <% else %>
+              <div class="row">
+                <div class="col-xs-12">
+                  <% rating = @current_movie.ratings.average(:rating).to_f.round(1) %>
+                  <% if rating > 1.6 %>
+                    <i class="material-icons">sentiment_very_satisfied</i>
+                  <% elsif rating > 1.2 %>
+                    <i class="material-icons">sentiment_satisfied</i>
+                  <% elsif rating < 0.8 %>
+                    <i class="material-icons">sentiment_dissatisfied</i>
+                  <% elsif rating < 0.4 %>
+                    <i class="material-icons">sentiment_very_dissatisfied</i>
+                  <% else %>
+                    <i class="material-icons">sentiment_neutral</i>
+                  <% end %>
+                </div>
+                <div class="col-xs-12">
+                  <%= @current_movie.ratings.count.inspect + " Ratings" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
         </div>
-        <div class="col-xs-6 movie-details">
-          <legend>Total User Ratings</legend>
-          <div class="content"><%= ml_m == nil ? "N/A" : ml_m.movielens_ratings.count.inspect %></div>
+        <div class="col-xs-8 movie-details">
+          <% if user_signed_in? %>
+            <form action="<%= movie_submit_rating_path %>" method="get" name="yourratingform">
+              <fieldset>
+                <legend>Your Rating</legend>
+                <div class="row">
+                  <div class="col-xs-4 text-center rating-radio">
+                    <%= radio_button_tag :r, "2", ratingChecked?("2"), onclick: "document.yourratingform.submit();" %><label for="r_2"><i class="material-icons">sentiment_very_satisfied</i></label>
+                  </div>
+                  <div class="col-xs-4 text-center rating-radio">
+                    <%= radio_button_tag :r, "1", ratingChecked?("1"), onclick: "document.yourratingform.submit();" %><label for="r_1"><i class="material-icons">sentiment_neutral</i></label>
+                  </div>
+                  <div class="col-xs-4 text-center rating-radio">
+                    <%= radio_button_tag :r, "0", ratingChecked?("0"), onclick: "document.yourratingform.submit();" %><label for="r_0"><i class="material-icons">sentiment_very_dissatisfied</i></label>
+                  </div>
+                </div>
+                <%= hidden_field_tag :m, params[:m], :id => "movie-id" %>
+              </fieldset>
+            </form>  
+            <script>
+              
+            </script>
+          <% else %>
+            <legend>Your Rating</legend>
+            <%= link_to "Sign in", new_user_session_path %> or <%= link_to "sign up", new_user_registration_path %> to rate this movie.
+          <% end %>
         </div>
       </div>
       <div class="row">
@@ -88,7 +138,11 @@
   </div>
   <div class="row">
     <div class="col-xs-12 movie-details">
-      <h4>Search for new recommendations by selecting genres or keywords below:</h4>
+      <div class="col-xs-12 movie-title-search"> 
+        <label>Search for a different movie: </label>
+        <%= render partial: "shared/movie_title_lookup" %>
+      </div>
+      <label for="recommendation-filter-form">Or find new recommendations by selecting genres or keywords from <%= @m["title"] %>:</label>
       <form action="<%= recommendation_index_path %>" method="get" id="recommendation-filter-form">
         <fieldset>
           <legend>Genres: </legend>
@@ -108,10 +162,12 @@
         </fieldset>
         <fieldset>
           <legend>Additional Keywords: </legend>
-          <% if ml_m != nil %>
-            <% ml_m.movielens_tags.order(:tag).pluck(:tag).uniq.each_with_index do |v,i| %>
-              <label for="checkbox-keywords-<%= i %>"><%= v.encode!('UTF-8', 'UTF-8', :invalid => :replace) %>
-                <%= check_box_tag "ak[]", v, false, :class => 'checkbox-keywords' %>
+          <% if @current_movie.tags.count == 0 %>
+            <p>None available</p>
+          <% else %>  
+            <% @current_movie.tag_keys.each_with_index do |v,i| %>
+              <label for="checkbox-keywords-<%= i %>"><%= v.tag_text %>
+                <%= check_box_tag "ak[]", v.id, false, :class => 'checkbox-keywords' %>
               </label>
             <% end %>
           <% end %>

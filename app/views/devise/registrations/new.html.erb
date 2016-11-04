@@ -1,0 +1,40 @@
+<div class="container main-body">
+  <div class="row">
+    <div class="col-xs-12 col-sm-offset-2 col-sm-8"> 
+      <h2>Sign up</h2>
+  
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+        <%= devise_error_messages! %>
+        
+        <div class="form-group">
+          <%= f.label "Username", for: "user-new-name" %>
+          <%= f.text_field :username, autofocus: true, class: "form-control", id: "user-new-name", placeholder: "1337d00d" %>
+        </div>
+        
+        <div class="form-group">
+          <%= f.label "Email address", for: "user-new-email" %>
+          <%= f.email_field :email, class: "form-control", id: "user-new-email", placeholder: "joebloggs@example.com" %>
+        </div>
+        
+        <div class="form-group">
+          <%= f.label "Password", for: "user-new-password" %>
+          <% if @minimum_password_length %>
+          <em>(<%= @minimum_password_length %> characters minimum)</em>
+          <% end %><br />
+          <%= f.password_field :password, autocomplete: "off", class: "form-control", id: "user-new-password" %>
+        </div>
+      
+        <div class="form-group">
+          <%= f.label "Please enter your password again", for: "user-new-passwordcon" %>
+          <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", id: "user-new-passwordcon" %>
+        </div>
+      
+        <div class="actions">
+          <%= f.submit "Sign up", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+      
+      <%= render "devise/shared/links" %>
+    </div>
+  </div>
+</div>
