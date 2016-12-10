@@ -7,55 +7,69 @@ class MovieController < ApplicationController
     require 'json' 
     
     @movie_id = params[:m]
+    @current_movie = Movie.find_by(tmdb: @movie_id)
     
-    # Retrieve database records and construct object
-    @current_movie = Movie.find_by tmdb: @movie_id
+    @movie_details = movieDetailsCreator(@movie_id,true)
     
-    puts "Current movie: #{@current_movie.inspect}"
-
+    if @current_movie.tag_keys.exists?
+      @keyword_list = @current_movie.tag_keys
+    else
+      @keyword_list = []
+    end
+    
     # Get JSON data from tmdb
-    url = "https://api.themoviedb.org/3/movie/" + @movie_id + "?api_key=" + TMDB_API_KEY + "&append_to_response=keywords,credits,recommendations,similar,reviews,releases"
-    uri = URI(url) 
-    response = Net::HTTP.get(uri)
-    @m = JSON.parse(response) 
+    i = 1
+    @recommendation_list = []
+    3.times do
+      url = "https://api.themoviedb.org/3/movie/" + @movie_id + "/similar?api_key=" + TMDB_API_KEY + "&page=" + i.to_s
+      uri = URI(url) 
+      response = Net::HTTP.get(uri)
+      m = JSON.parse(response)
+      @recommendation_list << m["results"]
+      i += 1
+    end
     
     # Prepare plus sign glyphicon span
     @glyphicon_plus = "<span class='glyphicon glyphicon-plus' aria-hidden='true'></span> "
-    
-    # Get JSON data from tmdb
-    url = "https://www.omdbapi.com/?i=" + @m["imdb_id"]
-    uri = URI(url) 
-    response = Net::HTTP.get(uri)
-    @i = JSON.parse(response) 
-    
+
     # Prepare poster array
-    @tmdb_recommends = @m["recommendations"]["results"] + @m["similar"]["results"]
-    @tmdb_recommends.sort! { |x,y| y["popularity"] <=> x["popularity"] }
-    @tmdb_recommends.uniq! { |v| v["id"] }
-    @tmdb_recommends.delete_if { |v| v["poster_path"] == nil } 
+    @recommendation_list.flatten!
+    @recommendation_list.compact!
+    @recommendation_list.sort! { |x,y| y["popularity"] <=> x["popularity"] }
+    @recommendation_list.uniq! { |v| v["id"] }
+    @recommendation_list.delete_if { |v| v["poster_path"] == nil } 
     
-    # Add new movie to db
-    if @current_movie == nil
-      genres = []
-      @m["genres"].each do |v|
-        genres.push(v["id"])
-      end
-      genrelist = genres.join(",")
-      
-      imdbID = @i["imdbID"]
-      imdbID[0..1] = ""
-      
-      record = Movie.new(
-        :title => @m["title"] + " (" + @m["release_date"][0..3] + ")", 
-        :genres => genrelist,
-        :imdb => imdbID,
-        :tmdb => @m["id"]
-      )
-      record.save!
-      puts "New movie in DB: #{Movie.last.inspect}"
+    user_rated_tmdb = []
+    
+    if user_signed_in?
+      user_rated = current_user.ratings.pluck(:movie_id)
+      user_rated_tmdb = Movie.where(tmdb: user_rated).pluck(:tmdb)
+      p user_rated_tmdb
     end
     
-    @current_movie = Movie.find_by tmdb: @movie_id if @current_movie == nil
+    @recommendations = []
+    
+    @recommendation_list.each do |v|
+      if @recommendations.count > 10
+        break
+      end
+      
+      if v["release_date"].to_date > 6.months.ago
+        next
+      end
+      
+      local = Movie.find_by(tmdb: v["id"])
+      
+      if local && local.ratings.pluck(:user_id).include?(current_user.id)
+        p "User Rated"
+        next 
+      end
+      if local
+        @recommendations.push(poster_path: local.poster_path, title: local.title, release_date: local.release_date, tmdb: local.tmdb)
+      else
+        @recommendations.push(poster_path: TMDB_IMG_BASE + TMDB_POSTER_SIZES[3] + v["poster_path"], title: v["title"], release_date: v["release_date"], tmdb: v["id"])
+      end
+    end
     
     # Get current user's rating of current movie
     @user_rating = ""
@@ -64,6 +78,7 @@ class MovieController < ApplicationController
         @user_rating = @current_movie.ratings.find_by(user_id: current_user.id) 
       end
     end
+    
   end
   
   def submitRating

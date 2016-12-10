@@ -4,7 +4,7 @@
 <form action="<%= search_movietitlelookup_path %>" method="get" id="movie-lookup-form">
   <div class="input-group ui-widget">
     <%= text_field_tag :t, params[:t], :class => "form-control", :id => "movie-title-lookup", :placeholder => "Enter a movie title..." %>
-    <%= hidden_field_tag :m, params[:m], :id => "movie-id" %>
+    <%= hidden_field_tag :m, params[:m], :id => "movie-id-hidden" %>
     <span class="input-group-btn">
       <%= submit_tag "Go!", :class => "btn btn-primary", :name => nil %>
     </span>

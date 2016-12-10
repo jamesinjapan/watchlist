@@ -1,0 +1,18 @@
+<div class="search-result col-xs-12 col-sm-6 col-md-4 col-lg-3">
+  <div class="search-title">
+    <% if r["release_date"].year.to_s == "" %>
+      <%= link_to r["title"], movie_index_path(:m => r["tmdb"]) %>
+    <% else %>
+      <%= link_to r["title"] + " (" + r["release_date"].year.to_s + ")", movie_index_path(:m => r["tmdb"]) %>
+    <% end %>
+  </div>
+  <div class="search-poster">
+    <% if r["poster_path"] == nil %>
+      <%= link_to image_tag('noposter.png', :class => "img-responsive"), movie_index_path(:m => r["tmdb"])  %>
+    <% elsif r["poster_path"][0..3] == "http" %>
+      <%= link_to image_tag(r["poster_path"], :class => "img-responsive"), movie_index_path(:m => r["tmdb"])  %>  
+    <% else %>
+      <%= link_to image_tag(TMDB_IMG_BASE + TMDB_POSTER_SIZES[3] + r["poster_path"], :class => "img-responsive"), movie_index_path(:m => r["tmdb"]) %>
+    <% end %>
+  </div>
+</div>

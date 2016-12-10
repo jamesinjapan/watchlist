@@ -3,55 +3,104 @@ class RecommendationController < ApplicationController
     require 'net/http' 
     require 'json' 
     
-    params.delete :m if params[:m].present?
-    
     @genres = params[:g] if params[:g].present?
     @keywords = params[:k] if params[:k].present?
-    @production_countries = params[:pc] if params[:pc].present?
-    @spoken_languages = params[:sl] if params[:sl].present?
-    @credits = params[:c] if params[:c].present?
+    @page = 1
+    @page = params[:p].to_i if params[:p].present?
+    p @page
+    # Build list of movie ids to recommend based on parameters given
+
+    @recommendation_list = []
+    keyword_recommendations = []
+    genre_recommendations = []
+    
+    if @keywords != nil
+      @keywords.each_with_index do |v, i|
+        keyword_recommendations[i] = Tag.where(tag_key_id: v).pluck(:movie_id)
+      end
+      recommendation_ids_k = keyword_recommendations.max_by(&:length)
+      keyword_recommendations -= [recommendation_ids_k]
+      recommendation_ids_k.zip(*keyword_recommendations).flatten.compact
+    end
+    
+    if @genres != nil
+      @genres.each_with_index do |v, i|
+        genre_recommendations[i] = Movie.where("genres LIKE ?","%#{v}%").pluck(:id)
+      end
+      recommendation_ids_g = genre_recommendations.max_by(&:length)
+      genre_recommendations -= [recommendation_ids_g]
+      recommendation_ids_g.zip(*genre_recommendations).flatten.compact
+    end
+    
+    if @keywords != nil && @genres != nil
+      recommendations_full = recommendation_ids_g.zip(recommendation_ids_k).flatten.compact 
+    elsif @keywords != nil 
+      recommendations_full = recommendation_ids_k
+    elsif @genres != nil
+      recommendations_full = recommendation_ids_g
+    else
+      recommendations_full = []
+    end
+    
+    # Remove movie user began search with
+    
+    @original_movie = Movie.find_by(tmdb: params[:m])
+    if recommendations_full.include?(params[:m])
+      recommendations_full.delete(params[:m])
+    end
+
+    
+    # Move movies matching multiple criteria to front of list
+    
+    recommendations_dupes = recommendations_full.detect{ |v| recommendations_full.count(v) > 1 }
+    
+    unless recommendations_dupes.kind_of?(Array)
+      recommendations_dupes = [recommendations_dupes]
+    end
+    
+    recommendations_deduped = recommendations_full.uniq - recommendations_dupes.to_a.uniq
+    
+    @recommendation_ids = recommendations_dupes.uniq + recommendations_deduped
+    
+    @recommendation_ids.compact!
+    
+    # Remove movies the user has already rated
+    
+    if user_signed_in?
+      user_rated = current_user.ratings.pluck(:movie_id)
+      @recommendation_ids = @recommendation_ids - user_rated
+    end
+    
+    # Paginate
+    @total_pages = @recommendation_ids.count / 10
+    @total_pages = 1000 if @total_pages > 1000
+    @total_pages = 1 if @total_pages == 0
+    
+    if @page - 4 > 1 
+      @lowest_page = @page - 4
+    else
+      @lowest_page = 1
+    end
+    
+    @highest_page = (@page + 9) - (@page - @lowest_page) 
+    @highest_page = @total_pages if @highest_page > @total_pages
+   
+    lower_bound = (@page * 12) - 12
+    upper_bound = (@page * 12) - 1
+    
+    @recommendation_ids = @recommendation_ids[lower_bound..upper_bound]
+    
+    # Return movie data
     
     @recommendation_list = []
-
-    url = "https://api.themoviedb.org/3/discover/movie?api_key=" + TMDB_API_KEY + "&language=en-US&sort_by=popularity.desc&page=1"
-    url = url + "&with_genres=" + @genres.join(",") if @genres != nil 
-    url = url + "&with_keywords=" + @keywords.join(",") if @keywords != nil 
-    uri = URI(url) 
-    response = Net::HTTP.get(uri)
-    results = JSON.parse(response) 
-    @disc = results["results"]
-    results["results"].each do |v|
-      v["source"] = "discovery"
-      @recommendation_list.push(v.slice("id","title","release_date","poster_path","genre_ids", "vote_count", "source", "popularity", "overview"))
-    end
-
-    if @genres != nil 
-      url = "https://api.themoviedb.org/3/genre/" + @genres.join("+") + "/movies?api_key=" + TMDB_API_KEY
-      uri = URI(url) 
-      response = Net::HTTP.get(uri)
-      results = JSON.parse(response) 
-      results["results"].each do |v|
-        v["source"] = "genre"
-        @recommendation_list.push(v.slice("id","title","release_date","poster_path","genre_ids", "vote_count", "source", "popularity", "overview"))
+    @recommendation_ids.each do |v| 
+      p v
+      r = Movie.find(v)
+      if r.title == nil
+        next
       end
+      @recommendation_list.push(r)
     end
     
-    if @keywords != nil 
-      url = "https://api.themoviedb.org/3/keyword/" + @keywords.join("+") + "/movies?api_key=" + TMDB_API_KEY
-      uri = URI(url) 
-      response = Net::HTTP.get(uri)
-      results = JSON.parse(response) 
-      results["results"].each do |v|
-        v["source"] = "keyword"
-        @recommendation_list.push(v.slice("id","title","release_date","poster_path","genre_ids", "vote_count", "source", "popularity", "overview"))
-      end
-    end
-
-    @recommendation_list.delete_if { |v| v["poster_path"] == nil } 
-    @recommendation_list.delete_if { |v| v["id"].to_s == @current_movie.to_s } 
-    @recommendation_list.delete_if { |x| (@genres - x["genre_ids"].map { |v| v.to_s}).count == @genres.count } if @genres != nil 
-    @recommendation_list.uniq! { |v| v["id"] }
-    @recommendation_list.sort! { |x,y| y["popularity"] <=> x["popularity"] }
-    @recommendation_list.sort! { |x,y| (@genres - x["genre_ids"].map { |v| v.to_s}).count <=> (@genres - y["genre_ids"].map { |v| v.to_s}).count } if @genres != nil 
   end
 end

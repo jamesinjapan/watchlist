@@ -11,13 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161103082556) do
+ActiveRecord::Schema.define(version: 20161120041857) do
 
   create_table "movies", force: :cascade do |t|
     t.string "title"
     t.string "genres"
     t.string "imdb"
     t.string "tmdb"
+    t.string "certification"
+    t.date   "last_checked"
+    t.date   "release_date"
+    t.string "poster_path"
   end
 
   add_index "movies", ["imdb"], name: "imdb_ix"
@@ -45,13 +49,11 @@ ActiveRecord::Schema.define(version: 20161103082556) do
 
   create_table "tags", force: :cascade do |t|
     t.integer "tag_key_id"
-    t.integer "user_id"
     t.integer "movie_id"
   end
 
   add_index "tags", ["movie_id"], name: "index_tags_on_movie_id"
   add_index "tags", ["tag_key_id"], name: "index_tags_on_tag_key_id"
-  add_index "tags", ["user_id"], name: "index_tags_on_user_id"
 
   create_table "users", force: :cascade do |t|
     t.string   "username"
@@ -65,11 +67,11 @@ ActiveRecord::Schema.define(version: 20161103082556) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
+    t.string   "certificate_limit"
+    t.string   "watchlist"
+    t.string   "recommendations"
   end
 
   add_index "users", ["username"], name: "index_users_on_username", unique: true
-
-# Could not dump table "users_bk" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
 
 end

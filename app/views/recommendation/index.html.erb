@@ -6,32 +6,19 @@
   </div>
   <div class="row">
     <div class="col-xs-12 page-title">
-      <h1>Recommendations for you</h1>
+      <h1>Recommendations based on "<%= @original_movie.title %>"</h1>
+      <p>Page <%= @page %> of <%= @total_pages %> (Total number of results: <%= @recommendation_ids.count %>)</p>
+      <%= render partial: "shared/search_pages", locals: {current_page: @page, lowest_page: @lowest_page, highest_page: @highest_page, total_pages: @total_pages} %>
     </div>
-  </div>
-  <div class="row row-eq-height">
-    <% @recommendation_list.each_with_index { |r, i| %>
-      <div class="col-xs-12 col-sm-4 col-lg-2 recommendation-poster">
-        <% if r["poster_path"] == nil %>
-          <%= link_to image_tag('noposter'), movie_index_path(:m => r["id"])  %>
-        <% else %>
-          <%= link_to image_tag(TMDB_IMG_BASE + TMDB_POSTER_SIZES[3] + r["poster_path"], :class => "img-responsive"), movie_index_path(:m => r["id"]) %>
-        <% end %>
-      </div>
-      <div class="col-xs-12 col-sm-8 col-lg-4 recommendation-details">
-        <% if r["release_date"] == nil || r["release_date"][0..3] == "" %>
-          <h4><%= link_to r["title"], movie_index_path(:m => r["id"]) %></h4>
-        <% else %>
-           <h4><%= link_to r["title"] + " (" + r["release_date"][0..3] + ")", movie_index_path(:m => r["id"]) %></h4>
-        <% end %>
-        <p><%= r["overview"] %></p>
-        <div class="col-xs-12 genre-buttons">
-          <% r["genre_ids"].each { |v| %>
-            <% g = TMDB_GENRE_LIST.find { |x| x["id"] == v } %>
-            <%= button_tag g["name"], :class => "btn btn-primary" if g != nil %>
-          <% } %>
-        </div>
-      </div>
-    <% } %>
+    <div class="col-xs-12">
+      <div class="row row-eq-height">
+      <% @recommendation_list.each_with_index { |r, i| %>
+        <%= render partial: "shared/recommendation_result", locals: {r: r, i: i} %>
+      <% } %>
+    </div>
+    </div>
+    <div class="col-xs-12 search-page-title">
+      <%= render partial: "shared/search_pages", locals: {current_page: @page, lowest_page: @lowest_page, highest_page: @highest_page, total_pages: @total_pages} %>
+    </div>
   </div>
 </div>

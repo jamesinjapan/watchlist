@@ -27,6 +27,7 @@ gem "js-routes"
 gem "faker"
 gem "pry"
 gem "devise"
+gem "iso-639"
 
 # Use Unicorn as the app server
 # gem 'unicorn'

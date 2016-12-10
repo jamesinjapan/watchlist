@@ -23,7 +23,7 @@ $(document).ready( function() {
         return false;
       },
       select: function(event, ui) {
-        $('#movie-id').val(ui.item.value);
+        $('#movie-id-hidden').val(ui.item.value);
         $(this).val(ui.item.label);
         $("#movie-lookup-form").submit();
         return false;

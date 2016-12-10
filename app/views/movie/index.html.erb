@@ -1,99 +1,109 @@
-<% if @m["backdrop_path"] != nil %><div class="container-fluid">
+<!-- Backdrop & Title -->
+<% if @movie_details.key?(:backdrop_path) %>
   <div class="container-fluid">
-    <div class="jumbotron" style="background-image: url('<%= TMDB_IMG_BASE + TMDB_BACKDROP_SIZES.last + @m["backdrop_path"] %>'); border-radius:0px;" >
+    <div class="jumbotron" style="background-image: url('<%= @movie_details[:backdrop_path] %>'); border-radius:0px;" >
       <div class="row dark-overlay">
-        <div class="col-xs-10 col-xs-offset-1 movie-title-search"> 
-          <%= render partial: "shared/movie_title_lookup" %>
-        </div>
-        <div class="col-xs-12">
-          <h1 class="movie-header"><%= @m["title"] %><%= " (#{@m["original_title"]})" if @m["original_title"] != @m["title"] %><br><small><%= @m["tagline"] %></small></h1>
-        </div>
-      </div>
-    </div>
 <% else %>
-  <div class="container main-body">
+  <div class="container main-body">  
     <div class="row">
-      <div class="col-xs-12">
-        <div class="col-xs-12 col-xs-offset-1 movie-title-search"> 
-          <%= render partial: "shared/movie_title_lookup" %>
-        </div>
-        <div class="col-xs-12"> 
-          <h1 class="movie-header"><%= @m["title"] %><%= " (#{@m["original_title"]})" if @m["original_title"] != @m["title"] %><br><small><%= @m["tagline"] %></small></h1>
+<% end %>
+        <div class="col-xs-12">
+          <h1 class="movie-header"><%= @movie_details[:title] %> <%= @movie_details[:original_title] if @movie_details.key?(:original_title) %><br><small><%= @movie_details[:tagline] if @movie_details.key?(:tagline)%></small></h1>
         </div>
       </div>
     </div>
-  <% end %>
-</div>
+<% if @movie_details.key?(:backdrop_path) %></div><% end %>
+
+<!-- Movie details and recommendation form -->
 <div class="container main-body">
   <div class="movie-sheet row-eq-height">
     <div class="movie-poster-div text-center">
-      <%= image_tag TMDB_IMG_BASE + TMDB_POSTER_SIZES[4] + @m["poster_path"], :class => "img-responsive movie-poster", :alt =>  "#{@m["title"]} #{@m["release_date"]}" %>
+      <% if @movie_details.key?(:poster_path) %>
+        <%= image_tag @movie_details[:poster_path], :class => "img-responsive movie-poster", :alt =>  "#{@movie_details[:title]} (#{@movie_details[:release_date][0..3]})" %>
+      <% else %>
+        <%= image_tag('noposter.png', :class => "img-responsive") %>
+      <% end %>
     </div>
     <div class="movie-details-div">
-      <div class="row">
-        <div class="col-xs-4 movie-details">
+      <div class="row row-eq-height">
+        <div class="movie-details">
           <legend>Release date</legend>
-          <div class="content"><%= @m["release_date"] %></div>
-        </div>
-        <div class="col-xs-4 movie-details">
-          <legend>Rating</legend>
           <div class="content">
-            <% if @i["Rated"] != nil %>
-              <%= @i["Rated"] %>
-            <% elsif @m["releases"]["countries"] == nil %>
-              N/A
-            <% elsif @m["releases"]["countries"][0]["iso_3166_1"] != "US" %>
-              <%= @m["releases"]["countries"][0]["certification"] + "(" + @m["releases"]["countries"][0]["iso_3166_1"] + ")" %>
-            <% else %>
-              <%= @m["releases"]["countries"][0]["certification"] %>
-            <% end %>
+            <%= @movie_details.key?(:release_date) ? @movie_details[:release_date] : "Release date data unavailable." %>
           </div>
         </div>
-        <div class="col-xs-4 movie-details">
+        <div class="movie-details">
+          <legend>Certificate</legend>
+          <div class="content">
+            <%= @movie_details.key?(:certification) ? @movie_details[:certification] : "Certificate data unavailable." %>
+          </div>
+        </div>
+        <div class="movie-details">
           <legend>Runtime</legend>
-          <div class="content"><%= @m["runtime"] %> minutes</div>
+          <div class="content">
+            <%= @movie_details.key?(:runtime) ? @movie_details[:runtime].to_s + " minutes" : "Runtime data unavailable." %>
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-4 movie-details">
+        <div class="movie-details">
           <legend>Country</legend>
-          <div class="content"><%= @i["Country"] %></div>
+          <div class="content">
+            <%= @movie_details.key?(:country) ? @movie_details[:country] : "Country data unavailable." %>
+          </div>
         </div>
-        <div class="col-xs-8 movie-details">
+        <div class="movie-details">
+          <legend>Language</legend>
+          <div class="content">
+            <%= @movie_details.key?(:original_language) ? ISO_639.find(@movie_details[:original_language]).english_name : "Language data unavailable." %>
+          </div>
+        </div>
+        <div class="movie-details">
           <legend>Awards</legend>
-          <div class="content"><%= @i["Awards"] %></div>
+          <div class="content">
+            <%= @movie_details.key?(:awards) ? @movie_details[:awards] : "Awards data unavailable." %>
+          </div>
+        </div>
+        <div class="movie-details">
+          <legend>Metascore</legend>
+          <div class="content">
+            <%= @movie_details.key?(:metascore) ? @movie_details[:metascore] : "Metascore unavailable." %>
+          </div>
+        </div>
+        <div class="movie-details">
+          <legend>IMDB Rating</legend>
+          <div class="content">
+            <%= @movie_details.key?(:imdb_rating) ? @movie_details[:imdb_rating] : "IMDB rating unavailable." %>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-xs-4 movie-details">
+      <div class="row row-eq-height">
+        <div class="movie-details">
           <legend>User Rating</legend>
           <div class="content">
-            <% if @current_movie == nil || @current_movie.ratings.empty? %>
-              Not rated yet!
-            <% else %>
+            <% if @movie_details.key?(:num_user_rating) %>
               <div class="row">
                 <div class="col-xs-12">
-                  <% rating = @current_movie.ratings.average(:rating).to_f.round(1) %>
-                  <% if rating > 1.6 %>
+                  <% if @movie_details[:avg_user_rating] > 1.6 %>
                     <i class="material-icons">sentiment_very_satisfied</i>
-                  <% elsif rating > 1.2 %>
+                  <% elsif @movie_details[:avg_user_rating] > 1.2 %>
                     <i class="material-icons">sentiment_satisfied</i>
-                  <% elsif rating < 0.8 %>
+                  <% elsif @movie_details[:avg_user_rating] < 0.8 %>
                     <i class="material-icons">sentiment_dissatisfied</i>
-                  <% elsif rating < 0.4 %>
+                  <% elsif @movie_details[:avg_user_rating] < 0.4 %>
                     <i class="material-icons">sentiment_very_dissatisfied</i>
                   <% else %>
                     <i class="material-icons">sentiment_neutral</i>
                   <% end %>
                 </div>
                 <div class="col-xs-12">
-                  <%= @current_movie.ratings.count.inspect + " Ratings" %>
+                  <%= @movie_details[:num_user_rating] + " Ratings" %>
                 </div>
               </div>
+            <% else %>
+              <%= @movie_details[:avg_user_rating] %>
             <% end %>
           </div>
         </div>
-        <div class="col-xs-8 movie-details">
+        <div class="movie-details">
           <% if user_signed_in? %>
             <form action="<%= movie_submit_rating_path %>" method="get" name="yourratingform">
               <fieldset>
@@ -109,12 +119,9 @@
                     <%= radio_button_tag :r, "0", ratingChecked?("0"), onclick: "document.yourratingform.submit();" %><label for="r_0"><i class="material-icons">sentiment_very_dissatisfied</i></label>
                   </div>
                 </div>
-                <%= hidden_field_tag :m, params[:m], :id => "movie-id" %>
+                <%= hidden_field_tag :m, params[:m], :id => "movie-id", :value => @movie_details[:tmdb] %>
               </fieldset>
             </form>  
-            <script>
-              
-            </script>
           <% else %>
             <legend>Your Rating</legend>
             <%= link_to "Sign in", new_user_session_path %> or <%= link_to "sign up", new_user_registration_path %> to rate this movie.
@@ -124,15 +131,33 @@
       <div class="row">
         <div class="col-xs-12 movie-details">
           <legend>Synopsis</legend>
-          <div class="content"><%= @m["overview"] %></div>
-        </div>
-        <% if @m["reviews"]["results"][0] != nil %>
-          <div class="col-xs-12 movie-details">
-            <% review = @m["reviews"]["results"].shuffle[0] %>
-            <legend>Review by <%=review["author"] %> (via TMDb)</legend>
-            <div class="content"><%= raw truncate(review["content"], :length => 1500, :separator => ' ') + " " %><%= link_to "(read more)" , review["url"] %></div>
+          <div class="content">
+            <%= @movie_details.key?(:overview) ? @movie_details[:overview] : "Synopsis unavailable." %>
           </div>
-        <% end %>
+        </div>
+      </div>
+      <div class="row row-eq-height">
+        <div class="col-xs-12">
+          <legend>Cast & Crew</legend>
+        </div>
+        <div class="movie-details">
+          <b>Director</b>
+          <div class="content">
+            <%= @movie_details.key?(:director) ? @movie_details[:director] : "Director data unavailable." %>
+          </div>
+        </div>
+        <div class="movie-details">
+          <b>Writer</b>
+          <div class="content">
+            <%= @movie_details.key?(:writer) ? @movie_details[:writer] : "Writer data unavailable." %>
+          </div>
+        </div>
+        <div class="movie-details">
+          <b>Cast</b>
+          <div class="content">
+            <%= @movie_details.key?(:cast) ? @movie_details[:cast] : "Cast data unavailable." %>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -142,50 +167,40 @@
         <label>Search for a different movie: </label>
         <%= render partial: "shared/movie_title_lookup" %>
       </div>
-      <label for="recommendation-filter-form">Or find new recommendations by selecting genres or keywords from <%= @m["title"] %>:</label>
+      <label for="recommendation-filter-form">Or find new recommendations by selecting genres or keywords from <%= @movie_details[:title] %>:</label>
       <form action="<%= recommendation_index_path %>" method="get" id="recommendation-filter-form">
         <fieldset>
           <legend>Genres: </legend>
-          <% @m["genres"].each_with_index do |v,i| %>
-              <label for="checkbox-genres-<%= i %>"><%= v["name"] %>
-                <%= check_box_tag "g[]", v["id"], false, :class => 'checkbox-genres' %>
-              </label>
-          <% end %>
-        </fieldset>
-        <fieldset>
-          <legend>Keywords: </legend>
-          <% @m["keywords"]["keywords"].each_with_index do |v,i| %>
-            <label for="checkbox-keywords-<%= i %>"><%= v["name"] %>
-              <%= check_box_tag "k[]", v["id"], false, :class => 'checkbox-keywords' %>
-            </label>
-          <% end %>
-        </fieldset>
-        <fieldset>
-          <legend>Additional Keywords: </legend>
-          <% if @current_movie.tags.count == 0 %>
-            <p>None available</p>
-          <% else %>  
-            <% @current_movie.tag_keys.each_with_index do |v,i| %>
-              <label for="checkbox-keywords-<%= i %>"><%= v.tag_text %>
-                <%= check_box_tag "ak[]", v.id, false, :class => 'checkbox-keywords' %>
+          <% if @movie_details[:genres] != nil %>
+            <% @movie_details[:genres].split(",").each do |v| %>
+              <label for="checkbox-genres-<%= v.to_s %>"><%= TMDB_GENRE_LIST.select { |g| g["id"] == v.to_i }[0]["name"]%>
+                <%= check_box_tag "g[]", v, false, :class => 'checkbox-genres' %>
               </label>
             <% end %>
           <% end %>
         </fieldset>
-        <%= hidden_field_tag :m, @m["id"], :id => "movie-id" %>
+        <fieldset>
+          <legend>Keywords: </legend>
+          <% @keyword_list.each do |v| %>
+            <label for="checkbox-keywords-<%= v.id %>"><%= v.tag_text %>
+              <%= check_box_tag "k[]", v.id, false, :class => 'checkbox-keywords' %>
+            </label>
+          <% end %>
+        </fieldset>
+        <%= hidden_field_tag :m, @movie_details[:tmdb], :id => "movie-id" %>
         <%= submit_tag "Get new recommendations", :class => "btn btn-primary", :name => nil %>
       </form>
     </div>
   </div>
   <div class="col-xs-12 movie details">
-    <h4>People who liked <%= @m["title"] %> also liked:</h4>
+    <h4>Similar movies to <%= @movie_details[:title] %>:</h4>
   </div>
 </div>
 <div class="container-fluid">
   <div class="owl-carousel">
-    <% @tmdb_recommends.each_with_index do |v,i| %>
+    <% @recommendations.each do |v,i| %>
       <div>
-        <%= link_to image_tag(TMDB_IMG_BASE + TMDB_POSTER_SIZES[4] + v["poster_path"], :class => "img-responsive", :alt =>  "#{v["title"]} #{v["release_date"]}"), movie_index_path(:m => v["id"]) %>
+        <%= link_to image_tag(v[:poster_path], :class => "img-responsive", :alt =>  "#{v[:title]} #{v[:release_date]}"), movie_index_path(:m => v[:tmdb]) %>
       </div>
     <% end %>
   </div>

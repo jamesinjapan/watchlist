@@ -12,8 +12,13 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <% if user_signed_in? %>
-          <li class="navbar-text">Signed in as <%= current_user.username %></li>
-          <li class="navbar-text"><%= button_to "Sign out", destroy_user_session_path, class: "btn btn-danger", method: :delete %></li>
+          <li class="navbar-text">
+            <div class="row-eq-height">
+              <div class="loggedin-grow-text">Signed in as <%= current_user.username %></div>
+              <div class="loggedin-button"><%= button_to "Edit settings", edit_user_registration_path, class: "btn btn-default btn-loggedin" %></div>
+              <div class="loggedin-button"><%= button_to "Sign out", destroy_user_session_path, class: "btn btn-danger btn-loggedin", method: :delete %></div>
+            </div>
+          </li>
         <% else %>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Already have an account? <b>Sign in</b> <span class="caret"></span></a>
