@@ -7,11 +7,6 @@
         <%= devise_error_messages! %>
         
         <div class="form-group">
-          <%= f.label "Username", for: "user-new-name" %>
-          <%= f.text_field :username, autofocus: true, class: "form-control", id: "user-new-name", placeholder: "1337d00d" %>
-        </div>
-        
-        <div class="form-group">
           <%= f.label "Email address", for: "user-new-email" %>
           <%= f.email_field :email, class: "form-control", id: "user-new-email", placeholder: "joebloggs@example.com" %>
         </div>
