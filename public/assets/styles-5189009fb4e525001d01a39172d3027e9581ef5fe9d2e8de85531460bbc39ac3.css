@@ -1,0 +1,466 @@
+/* line 3, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+  overflow-x: hidden;
+  color: white;
+  background-color: #232323;
+}
+
+/* line 11, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+input {
+  color: #232323;
+}
+
+/* line 15, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.alert-success, .alert-danger, .alert-warning, .alert-info {
+  padding: 20px;
+}
+
+/* line 19, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* line 24, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.container {
+  background-color: #22313A;
+}
+
+/* line 28, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.main-body {
+  border-left: black 1px solid;
+  border-right: black 1px solid;
+}
+
+/* line 33, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: center;
+}
+
+/* line 44, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.jumbotron {
+  background-size: cover;
+  background-attachment: scroll;
+  background-position: center 25%;
+  margin-bottom: 0px;
+  margin-top: -20px;
+}
+
+/* line 52, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.btn-primary {
+  background-color: #629ABA;
+}
+
+/* line 56, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.dark-overlay {
+  background-image: url(/assets/75pcblack-61f31338cb37918435899c7cb640c84677362191a31af84b4e3036198f55f078.png);
+  background-repeat: repeat;
+}
+
+/* line 61, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.page-title {
+  background-color: #232323;
+  border-top: black 1px solid;
+  border-bottom: black 1px solid;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/* line 71, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar {
+  color: white;
+  background-color: #22313A;
+}
+
+/* line 76, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar-header {
+  margin-left: 10px !important;
+  margin-right: 10px !important;
+}
+
+/* line 81, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar-toggle {
+  margin-right: 0px !important;
+  clear: left;
+}
+
+/* line 86, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar-brand {
+  max-width: 80%;
+  padding: 0px;
+  margin-top: 2px;
+  margin-right: 0px;
+  margin-bottom: 0px !important;
+  margin-left: 0px !important;
+}
+
+/* line 95, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar-brand img {
+  height: 50px;
+  width: 241px;
+}
+
+/* line 100, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar-right {
+  margin-right: 0px !important;
+}
+
+/* line 104, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar-right .navbar-text {
+  max-height: 50px;
+  margin: 15px;
+}
+
+/* line 109, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar-right .navbar-text .btn-loggedin {
+  margin-top: -4px;
+  padding: 3px 15px;
+  display: block;
+}
+
+/* line 115, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar-right .dropdown a {
+  text-align: center;
+  color: white !important;
+}
+
+/* line 120, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar-right .dropdown a:hover {
+  color: #629ABA !important;
+}
+
+/* line 124, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.dropdown-menu {
+  padding: 20px;
+  background-color: #232323;
+  width: 100%;
+}
+
+/* line 130, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.navbar-nav li.open a {
+  background-color: #232323 !important;
+  border-bottom: black 1px solid !important;
+}
+
+/* line 135, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.loggedin-grow-text {
+  flex-grow: 1;
+  flex-shrink: 1;
+  order: 1;
+  min-width: 150px;
+  text-align: center;
+  padding-right: 10px;
+}
+
+@media (max-width: 440px) {
+  /* line 145, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+  .loggedin-grow-text {
+    flex-basis: 100%;
+    margin-bottom: 14px;
+  }
+}
+/* line 151, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.loggedin-button {
+  flex-shrink: 1;
+  order: 2;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+/* line 161, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.footer {
+  padding: 1%;
+  background-color: #22313A;
+  text-align: justify;
+  border-top: black 1px solid;
+}
+
+/* line 170, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.container-fluid .frontpage .row {
+  padding-bottom: 5vh;
+}
+
+/* line 174, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.container-fluid .jumbotron .row {
+  color: white;
+  margin: auto;
+  border-radius: 15px;
+  padding: 10px;
+}
+
+/* line 181, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.container-fluid .frontpage h1 {
+  font-size: 250%;
+  text-align: center;
+  color: white;
+  font-weight: 600;
+  padding: 1vh;
+  padding-bottom: 20px;
+  font-family: "Oxygen";
+}
+
+/* line 191, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.container-fluid .frontpage p {
+  text-align: justify;
+  color: white;
+  padding: 20px;
+  font-family: "Oxygen";
+  font-size: 130%;
+}
+
+/* line 199, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.container-fluid .frontpage h3 {
+  text-align: center;
+  color: white;
+  padding: 1vh;
+  font-family: "Oxygen";
+  font-size: 150%;
+}
+
+/* line 207, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.container-fluid .frontpage form {
+  padding: 3vh;
+  padding-bottom: 20px;
+}
+
+/* line 214, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.movie-header {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+/* line 221, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.movie-header small {
+  color: #629ABA;
+}
+
+/* line 225, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.movie-sheet {
+  color: white;
+}
+
+/* line 229, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.movie-poster-div {
+  padding: 0px;
+  order: 0;
+  flex-shrink: 1;
+  margin-left: -5px;
+  margin-top: 10px;
+}
+
+/* line 237, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.movie-details-div {
+  order: 1;
+  flex-grow: 1;
+  flex-basis: 50%;
+  padding: 0 10px;
+}
+
+/* line 244, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.movie-details .content, fieldset, .movie-details h4, .content-btns {
+  font-family: "Source Sans Pro";
+}
+
+/* line 248, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.content-btns {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: center;
+}
+
+/* line 259, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.content-btns .btn {
+  flex-grow: 1;
+  margin: 2px 5px;
+  font-family: "Source Sans Pro";
+}
+
+/* line 265, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+legend {
+  font-family: "Oxygen";
+  font-weight: bold;
+  display: block;
+  padding-right: 20px;
+  margin-bottom: 5px;
+  font-size: medium;
+  color: #629ABA;
+  border-bottom: 1px solid #629ABA;
+}
+
+/* line 276, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.rating-radio {
+  padding: 0 5px;
+}
+
+/* line 280, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.rating-radio input[type="radio"] {
+  visibility: hidden;
+  height: 0;
+  width: 0;
+  margin: 0;
+}
+
+/* line 287, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.rating-radio label {
+  width: 100%;
+  margin: 0;
+  padding: 10px;
+  border-radius: 25px;
+}
+
+/* line 294, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.rating-radio input[type="radio"]:checked + label {
+  background-color: #3C5968;
+}
+
+/* line 298, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.material-icons, .icon-text {
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* line 303, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.movie-details {
+  padding: 0px 20px;
+  margin: 10px 0px;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+/* line 310, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.movie-details fieldset {
+  margin: 0;
+}
+
+/* line 314, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.rating-radio input {
+  display: none;
+}
+
+/* line 318, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+fieldset {
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+/* line 323, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+fieldset label {
+  border: 1px black solid;
+  background-color: #337ab7;
+  padding: 5px;
+  color: white;
+  border-radius: 2px;
+  font-weight: normal;
+}
+
+/* line 335, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.search-result {
+  padding: 10px;
+  text-align: center;
+  flex: 0 1 auto;
+}
+
+/* line 341, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.search-title {
+  display: block;
+  background-color: #232323;
+  border-radius: 5px 5px 0px 0px;
+  border: white solid 1px;
+  border-bottom: none;
+  padding: 5px;
+}
+
+/* line 350, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.search-title a {
+  color: white;
+  font-weight: 600;
+}
+
+/* line 357, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.search-pages {
+  text-align: center;
+  background-color: #232323;
+  color: white;
+  margin: 20px 0px;
+  width: 100%;
+}
+
+/* line 365, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.search-pages a {
+  text-decoration: none;
+  color: #629ABA;
+}
+
+/* line 370, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.search-poster {
+  padding: 0;
+  border: white solid 1px;
+  border-top: none;
+  min-width: 200px;
+}
+
+/* line 379, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+#movie-lookup-form .form-control {
+  border-radius: 4px 0px 0px 4px;
+}
+
+/* line 383, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.movie-title-search {
+  padding: 20px 0;
+  margin-top: 10px;
+}
+
+/* line 388, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+#movie-lookup-form .input-group-btn .btn {
+  font-size: 14px;
+}
+
+/* line 392, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.ui-autocomplete {
+  max-height: 145px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* line 401, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.recommendation-poster {
+  padding: 10px;
+  text-align: center;
+}
+
+/* line 406, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.recommendation-details {
+  padding: 10px;
+}
+
+/* line 410, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.recommendation-details .genre-buttons {
+  text-align: center;
+}
+
+/* line 414, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.recommendation-details .genre-buttons .btn {
+  margin: 2px 1px;
+  padding: 4px 6px;
+}
+
+/* line 419, /home/ubuntu/workspace/app/assets/stylesheets/styles.scss */
+.recommendation-details p {
+  text-align: justify;
+}

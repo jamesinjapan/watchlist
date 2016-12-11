@@ -11,17 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161120041857) do
+ActiveRecord::Schema.define(version: 20161211102205) do
 
   create_table "movies", force: :cascade do |t|
-    t.string "title"
-    t.string "genres"
-    t.string "imdb"
-    t.string "tmdb"
-    t.string "certification"
-    t.date   "last_checked"
-    t.date   "release_date"
-    t.string "poster_path"
+    t.string  "title"
+    t.string  "genres"
+    t.string  "imdb"
+    t.string  "tmdb"
+    t.string  "certification"
+    t.date    "last_checked"
+    t.date    "release_date"
+    t.string  "poster_path"
+    t.string  "gb_id"
+    t.boolean "availability_online"
   end
 
   add_index "movies", ["imdb"], name: "imdb_ix"
@@ -56,7 +58,6 @@ ActiveRecord::Schema.define(version: 20161120041857) do
   add_index "tags", ["tag_key_id"], name: "index_tags_on_tag_key_id"
 
   create_table "users", force: :cascade do |t|
-    t.string   "username"
     t.string   "email",                  default: "", null: false
     t.string   "encrypted_password",     default: "", null: false
     t.string   "reset_password_token"
@@ -71,7 +72,5 @@ ActiveRecord::Schema.define(version: 20161120041857) do
     t.string   "watchlist"
     t.string   "recommendations"
   end
-
-  add_index "users", ["username"], name: "index_users_on_username", unique: true
 
 end

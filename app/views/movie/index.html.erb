@@ -75,64 +75,66 @@
           </div>
         </div>
       </div>
-      <div class="row row-eq-height">
-        <div class="movie-details">
-          <legend>User Rating</legend>
-          <div class="content">
-            <% if @movie_details.key?(:num_user_rating) %>
-              <div class="row">
-                <div class="col-xs-12">
-                  <% if @movie_details[:avg_user_rating] > 1.6 %>
-                    <i class="material-icons">sentiment_very_satisfied</i>
-                  <% elsif @movie_details[:avg_user_rating] > 1.2 %>
-                    <i class="material-icons">sentiment_satisfied</i>
-                  <% elsif @movie_details[:avg_user_rating] < 0.8 %>
-                    <i class="material-icons">sentiment_dissatisfied</i>
-                  <% elsif @movie_details[:avg_user_rating] < 0.4 %>
-                    <i class="material-icons">sentiment_very_dissatisfied</i>
-                  <% else %>
-                    <i class="material-icons">sentiment_neutral</i>
-                  <% end %>
+      <% if @movie_details.key?(:release_date) == false || @movie_details[:release_date].to_datetime < DateTime.now %>
+        <div class="row row-eq-height">
+          <div class="movie-details">
+            <legend>User Rating</legend>
+            <div class="content">
+              <% if @movie_details.key?(:num_user_rating) %>
+                <div class="row">
+                  <div class="col-xs-12">
+                    <% if @movie_details[:avg_user_rating] > 1.6 %>
+                      <i class="material-icons">sentiment_very_satisfied</i>
+                    <% elsif @movie_details[:avg_user_rating] > 1.2 %>
+                      <i class="material-icons">sentiment_satisfied</i>
+                    <% elsif @movie_details[:avg_user_rating] < 0.8 %>
+                      <i class="material-icons">sentiment_dissatisfied</i>
+                    <% elsif @movie_details[:avg_user_rating] < 0.4 %>
+                      <i class="material-icons">sentiment_very_dissatisfied</i>
+                    <% else %>
+                      <i class="material-icons">sentiment_neutral</i>
+                    <% end %>
+                  </div>
+                  <div class="col-xs-12">
+                    <%= @movie_details[:num_user_rating] + " Ratings" %>
+                  </div>
                 </div>
-                <div class="col-xs-12">
-                  <%= @movie_details[:num_user_rating] + " Ratings" %>
-                </div>
-              </div>
+              <% else %>
+                <%= @movie_details[:avg_user_rating] %>
+              <% end %>
+            </div>
+          </div>
+          <div class="movie-details">
+            <% if user_signed_in? %>
+              <form action="<%= movie_submit_rating_path %>" method="get" name="yourratingform">
+                <fieldset>
+                  <legend>Your Rating</legend>
+                  <div class="row">
+                    <div class="col-xs-4 text-center rating-radio">
+                      <%= radio_button_tag :r, "2", rating_checked?("2"), onclick: "document.yourratingform.submit();" %><label for="r_2"><i class="material-icons">sentiment_very_satisfied</i></label>
+                    </div>
+                    <div class="col-xs-4 text-center rating-radio">
+                      <%= radio_button_tag :r, "1", rating_checked?("1"), onclick: "document.yourratingform.submit();" %><label for="r_1"><i class="material-icons">sentiment_neutral</i></label>
+                    </div>
+                    <div class="col-xs-4 text-center rating-radio">
+                      <%= radio_button_tag :r, "0", rating_checked?("0"), onclick: "document.yourratingform.submit();" %><label for="r_0"><i class="material-icons">sentiment_very_dissatisfied</i></label>
+                    </div>
+                  </div>
+                  <%= hidden_field_tag :m, params[:m], :id => "movie-id", :value => @movie_details[:tmdb] %>
+                </fieldset>
+              </form>  
             <% else %>
-              <%= @movie_details[:avg_user_rating] %>
+              <legend>Your Rating</legend>
+              <%= link_to "Sign in", new_user_session_path %> or <%= link_to "sign up", new_user_registration_path %> to rate this movie.
             <% end %>
           </div>
         </div>
-        <div class="movie-details">
-          <% if user_signed_in? %>
-            <form action="<%= movie_submit_rating_path %>" method="get" name="yourratingform">
-              <fieldset>
-                <legend>Your Rating</legend>
-                <div class="row">
-                  <div class="col-xs-4 text-center rating-radio">
-                    <%= radio_button_tag :r, "2", ratingChecked?("2"), onclick: "document.yourratingform.submit();" %><label for="r_2"><i class="material-icons">sentiment_very_satisfied</i></label>
-                  </div>
-                  <div class="col-xs-4 text-center rating-radio">
-                    <%= radio_button_tag :r, "1", ratingChecked?("1"), onclick: "document.yourratingform.submit();" %><label for="r_1"><i class="material-icons">sentiment_neutral</i></label>
-                  </div>
-                  <div class="col-xs-4 text-center rating-radio">
-                    <%= radio_button_tag :r, "0", ratingChecked?("0"), onclick: "document.yourratingform.submit();" %><label for="r_0"><i class="material-icons">sentiment_very_dissatisfied</i></label>
-                  </div>
-                </div>
-                <%= hidden_field_tag :m, params[:m], :id => "movie-id", :value => @movie_details[:tmdb] %>
-              </fieldset>
-            </form>  
-          <% else %>
-            <legend>Your Rating</legend>
-            <%= link_to "Sign in", new_user_session_path %> or <%= link_to "sign up", new_user_registration_path %> to rate this movie.
-          <% end %>
-        </div>
-      </div>
+      <% end %>
       <div class="row">
         <div class="col-xs-12 movie-details">
           <legend>Synopsis</legend>
           <div class="content">
-            <%= @movie_details.key?(:overview) ? @movie_details[:overview] : "Synopsis unavailable." %>
+            <%= @movie_details.key?(:overview) && @movie_details[:overview] != "" ? @movie_details[:overview] : "Synopsis unavailable." %>
           </div>
         </div>
       </div>
@@ -159,6 +161,21 @@
           </div>
         </div>
       </div>
+      <% if @movie_details[:watch_online].count > 0 %>
+        <div class="row row-eq-height">
+          <div class="col-xs-12">
+            <legend>Watch Online</legend>
+          </div>
+          <div class="content-btns">
+              <% @movie_details[:watch_online].each do |source| %>
+                <% if source["link"][0..4] = "http:" 
+                  source["link"] = "https" + source["link"][4..-1]
+                end %>
+                <%= link_to raw("<span class='glyphicon glyphicon-film' aria-hidden='true'></span> ") + source["display_name"], source["link"], class: "btn btn-primary", target: "_blank" %>
+              <% end %>
+          </div>
+        </div>
+      <% end %>
     </div>
   </div>
   <div class="row">

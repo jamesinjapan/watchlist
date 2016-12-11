@@ -6,13 +6,13 @@ Rails.application.routes.draw do
   get 'movie/index'
   post 'movie/index'
   
-  get 'movie/submit-rating' => 'movie#submitRating'
+  get 'movie/submit-rating' => 'movie#submit_rating'
 
   get 'search/index'
   post 'search/index'
-  get 'search/movietitlelookup' => 'search#movieTitleLookup'
-  get 'search/movietitlelocal' => 'search#movieTitleAutocompleteLocal'
-  get 'search/movietitleremote' => 'search#movieTitleAutocompleteRemote'
+  get 'search/movietitlelookup' => 'search#movie_title_lookup'
+  get 'search/movietitlelocal' => 'search#movie_title_autocomplete_local'
+  get 'search/movietitleremote' => 'search#movie_title_autocomplete_remote'
 
   get 'welcome/index'
   post 'welcome/index'

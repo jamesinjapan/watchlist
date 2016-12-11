@@ -1,8 +1,5 @@
 class RecommendationController < ApplicationController
   def index
-    require 'net/http' 
-    require 'json' 
-    
     @genres = params[:g] if params[:g].present?
     @keywords = params[:k] if params[:k].present?
     @page = 1

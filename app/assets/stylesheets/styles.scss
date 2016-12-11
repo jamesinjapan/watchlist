@@ -241,8 +241,29 @@ input {
   padding: 0 10px;
 }
 
-.movie-details .content, fieldset, .movie-details h4 {
+.movie-details .content, fieldset, .movie-details h4, .content-btns {
   font-family: "Source Sans Pro";
+}
+
+.content-btns {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: center;
+}
+
+.content-btns .btn {
+  flex-grow: 1;
+  margin: 2px 5px;
+  font-family: "Source Sans Pro";
+}
+
+.content-btns .btn span {
+  margin-right: 10px;
 }
 
 legend {

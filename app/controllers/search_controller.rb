@@ -4,10 +4,6 @@ class SearchController < ApplicationController
       redirect_to movie_index_path + "?m=" + params[:m]
     end
     
-    # Libraries for JSON
-    require 'net/http' 
-    require 'json' 
-    
     # Set current page
     @current_page = params[:p].to_i
     @current_page = 1 if params[:p] == nil
@@ -32,7 +28,7 @@ class SearchController < ApplicationController
     @highest_page = @total_pages if @highest_page > @total_pages
   end
   
-  def movieTitleLookup
+  def movie_title_lookup
     if params[:m].present?
       redirect_to movie_index_path + "?m=" + params[:m]
     else
@@ -40,9 +36,7 @@ class SearchController < ApplicationController
     end
   end
   
-  def movieTitleAutocompleteLocal
-    require 'json' 
-    
+  def movie_title_autocomplete_local
     movietitle_hash = []
     
     localmovies = MovielensMovie.where("title LIKE '#{params[:t]}%'")
@@ -54,10 +48,7 @@ class SearchController < ApplicationController
     render json: movietitle_hash
   end 
   
-  def movieTitleAutocompleteRemote
-    require 'net/http' 
-    require 'json' 
-    
+  def movie_title_autocomplete_remote
     movietitle_hash = []
     
     url = "https://api.themoviedb.org/3/search/movie?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US&query=" + params[:t]

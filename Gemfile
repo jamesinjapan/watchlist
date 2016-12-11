@@ -28,6 +28,7 @@ gem "faker"
 gem "pry"
 gem "devise"
 gem "iso-639"
+gem "rubycritic"
 
 # Use Unicorn as the app server
 # gem 'unicorn'

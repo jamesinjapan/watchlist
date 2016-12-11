@@ -12,5 +12,7 @@ module ApplicationHelper
     @devise_mapping ||= Devise.mappings[:user]
   end
   
-  
+  def recommendations_by_tmdb_id(list, user)
+    Movie.where(tmdb: list).ids - user.ratings.pluck(:movie_id)
+  end
 end

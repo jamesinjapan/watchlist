@@ -1,4 +1,6 @@
+# ApplicationController holds application-wide methods
 class ApplicationController < ActionController::Base
+  
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
@@ -13,307 +15,261 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit :account_update, keys: added_attrs
   end
   
-  def getMovieDetailsTmdb(tmdb_id)
-    require 'net/http' 
-    require 'json' 
-
+  # Return movie details from external TMDb API
+  def movie_details_from_tmdb(tmdb_id)
     url = "https://api.themoviedb.org/3/movie/" + tmdb_id + "?api_key=" + TMDB_API_KEY + "&append_to_response=keywords,recommendations,similar,release_dates"
     uri = URI(url) 
     response = Net::HTTP.get(uri)
     return JSON.parse(response)
   end
   
-  def getMovieDetailsOmdb(param)
-    require 'net/http' 
-    require 'json' 
-    
-    url = "https://www.omdbapi.com/?" + param
-    puts url
+  # Return movie details from external omdb API
+  def movie_details_from_omdb(imdb_id)
+    url = "https://www.omdbapi.com/?" + imdb_id
     uri = URI(url) 
     response = Net::HTTP.get(uri)
     puts response.force_encoding("UTF-8").to_json
     return JSON.parse(response)
   end
   
-  def updateDbInBackground(list)
+  # Return Guidebox movie id from external Guidebox API
+  def movie_id_from_gb(tmdb_id)
+    url = "https://api-public.guidebox.com/v1.43/US/" + GB_API_KEY + "/search/movie/id/themoviedb/" + tmdb_id
+    uri = URI(url) 
+    response = Net::HTTP.get(uri)
+    full_response = JSON.parse(response)
+    return full_response["id"]
+  end
+  
+  # Return Guidebox movie details from external Guidebox API
+  def movie_details_from_gb(gb_id)
+    url = "https://api-public.guidebox.com/v1.43/US/" + GB_API_KEY + "/movie/" + gb_id
+    p url
+    uri = URI(url) 
+    response = Net::HTTP.get(uri)
+    return JSON.parse(response)
+  end
+  
+  # Add or change movies in thread to reduce impact on user
+  def update_db_in_background(list)
     Thread.new do
-      update_db_list.each do |v|
-        movieDetailsCreator(v,false)
+      list.each do |id|
+        movie_details_creator(id,false)
       end
       ActiveRecord::Base.connection.close
     end
   end
   
-  def getRecommendationsFromTmdbId(list, user)
-    Movie.where(tmdb: list).ids - user.ratings.pluck(:movie_id)
-  end
-  
-  def updateRecommendationsInBackground(user)
-    require 'net/http' 
-    require 'json' 
-    
-    Thread.new do
-      
-      open('log.csv', 'a') do |f|
-        f.puts user.inspect
-      end
-      
-      recommendations = []
-      tmdb_recommendations = []
-      pg = 1
-      
-      if user.recommendations == nil || user == nil
-        
-        open('log.csv', 'a') { |f|
-          f.puts "Nil option"
-        }
-        
-        while recommendations.count < 10 do
-        
-          open('log.csv', 'a') { |f|
-            f.puts "Until loop"
-            f.puts recommendations.count
-            f.puts pg
-          }
-        
-          url = "https://api.themoviedb.org/3/discover/movie?api_key=" + TMDB_API_KEY + "&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&release_date.lte=" + (Time.now - 1.year).strftime("%Y-%m-%d") + "&page=" + pg.to_s
-          uri = URI(url) 
-          response = Net::HTTP.get(uri)
-          result = JSON.parse(response)
-          
-          result["results"].map { |v| tmdb_recommendations.push(v["id"]) }
-          
-          recommendations = recommendations + getRecommendationsFromTmdbId(tmdb_recommendations, user)
-          recommendations.uniq!
-          pg += 1
-          
-        end
-        
-      else 
-        
-        open('log.csv', 'a') { |f|
-          f.puts "Non-nil option"
-        }
-        
-        liked_movie_ids = user.ratings.where(rating: "2").order("id desc").pluck(:movie_id)
-        liked_movies = Movie.where(id: liked_movie_ids).pluck(:tmdb)
-
-        liked_movies.reverse.each do |v|
-          
-          open('log.csv', 'a') { |f|
-            f.puts "Until loop"
-            f.puts recommendations.count
-            f.puts pg
-          }
-            
-          tmdb_data = getMovieDetailsTmdb(v)
-          
-          if tmdb_data.key?("recommendations") ||  tmdb_data.key?("similar")
-            recommendation_list = tmdb_data["recommendations"]["results"] + tmdb_data["similar"]["results"]
-            recommendation_list.map { |x| tmdb_recommendations.push(x["id"]) }
-          end
-          
-          recommendations = recommendations + getRecommendationsFromTmdbId(tmdb_recommendations, user)
-          recommendations.uniq!
-          
-          break if recommendations.count >= 10
-  
-        end
-      
-      end
-      
-      open('log.csv', 'a') { |f|
-        f.puts user.inspect
-        f.puts recommendations.to_s
-      }
-      
-      user.recommendations = recommendations.join(",")
-      user.save!
-  
-      ActiveRecord::Base.connection.close
-    end
-  end
-  
-  def movieDetailsCreator(tmdb_id, full)
-    @movie_details = { tmdb: tmdb_id }
+  # Gather local and external data to present to user
+  def movie_details_creator(tmdb_id, full)
+    movie_details = { tmdb: tmdb_id }
     update_movie_keys = []
     valid_certificates = ["G", "PG", "PG-13", "R", "NC-17", "Approved"]
     
-    local_data = Movie.find_by(tmdb: @movie_details[:tmdb])
+    local_data = Movie.find_by(tmdb: movie_details[:tmdb])
     new_movie_flag = false
     if local_data == nil
       new_movie_flag = true
     else
       if full
         if local_data.ratings.empty?
-          @movie_details[:avg_user_rating] = "Not rated yet!"
+          movie_details[:avg_user_rating] = "Not rated yet!"
         else
-          @movie_details[:avg_user_rating] = local_data.ratings.average(:rating).to_f.round(1)
-          @movie_details[:num_user_rating] = local_data.ratings.count.inspect
+          movie_details[:avg_user_rating] = local_data.ratings.average(:rating).to_f.round(1)
+          movie_details[:num_user_rating] = local_data.ratings.count.inspect
         end
       end
       if local_data.certification != nil
-        @movie_details[:certification] = local_data.certification
+        movie_details[:certification] = local_data.certification
       end
       if local_data.poster_path != nil
-        @movie_details[:poster_path] = local_data.poster_path
+        movie_details[:poster_path] = local_data.poster_path
       end
     end
     
     # Query tmdb api
-    tmdb_data = getMovieDetailsTmdb(@movie_details[:tmdb].to_s)
+    tmdb_data = movie_details_from_tmdb(movie_details[:tmdb].to_s)
     no_tmdb_data_flag = false
     if tmdb_data.key?("status_code")
       no_tmdb_data_flag = true
-      puts "tmdb_id " + @movie_details[:tmdb] + ": invalid response from tmdb api"
+      puts "tmdb_id " + movie_details[:tmdb] + ": invalid response from tmdb api"
     else
       if tmdb_data.key?("backdrop_path") && full
-        @movie_details[:backdrop_path] = TMDB_IMG_BASE.to_s + TMDB_BACKDROP_SIZES.last.to_s + tmdb_data["backdrop_path"].to_s
+        movie_details[:backdrop_path] = TMDB_IMG_BASE.to_s + TMDB_BACKDROP_SIZES.last.to_s + tmdb_data["backdrop_path"].to_s
       end
       
       if tmdb_data.key?("imdb_id") && (local_data == nil || tmdb_data["imdb_id"] != local_data.imdb)
         update_movie_keys.push(:imdb)
-        @movie_details[:imdb] = tmdb_data["imdb_id"]
+        movie_details[:imdb] = tmdb_data["imdb_id"]
       else
-        @movie_details[:imdb] = local_data.imdb
+        movie_details[:imdb] = local_data.imdb
       end
       
       if tmdb_data.key?("title") && (local_data == nil || tmdb_data["title"] != local_data.title)
         update_movie_keys.push(:title)
-        @movie_details[:title] = tmdb_data["title"]
+        movie_details[:title] = tmdb_data["title"]
       else
-        @movie_details[:title] = local_data.title
+        movie_details[:title] = local_data.title
       end
       
       if tmdb_data.key?("original_language") && full && ISO_639.search(tmdb_data["original_language"]) != []
-        @movie_details[:original_language] = tmdb_data["original_language"]
+        movie_details[:original_language] = tmdb_data["original_language"]
       end
       
-      if tmdb_data.key?("original_title") && tmdb_data["original_title"] != @movie_details[:title] && full
-        @movie_details[:original_title] = tmdb_data["original_title"]
+      if tmdb_data.key?("original_title") && tmdb_data["original_title"] != movie_details[:title] && full
+        movie_details[:original_title] = tmdb_data["original_title"]
       end
       
       if tmdb_data.key?("overview") && full
-        @movie_details[:overview] = tmdb_data["overview"]
+        movie_details[:overview] = tmdb_data["overview"]
       end
       
       if tmdb_data.key?("poster_path") && tmdb_data["poster_path"] != nil && full
         update_movie_keys.push(:poster_path)
-        @movie_details[:poster_path] = TMDB_IMG_BASE + TMDB_POSTER_SIZES[4] + tmdb_data["poster_path"]
+        movie_details[:poster_path] = TMDB_IMG_BASE + TMDB_POSTER_SIZES[4] + tmdb_data["poster_path"]
       end
       
       if tmdb_data.key?("release_date") && (local_data == nil || tmdb_data["release_date"] != local_data.release_date)
         update_movie_keys.push(:release_date)
-        @movie_details[:release_date] = tmdb_data["release_date"]
+        movie_details[:release_date] = tmdb_data["release_date"]
       else
-        @movie_details[:release_date] = local_data.release_date
+        movie_details[:release_date] = local_data.release_date
       end
       
       if tmdb_data.key?("runtime") && full
-        @movie_details[:runtime] = tmdb_data["runtime"]
+        movie_details[:runtime] = tmdb_data["runtime"]
       end
       
       if tmdb_data.key?("tagline") && full
-        @movie_details[:tagline] = tmdb_data["tagline"]
+        movie_details[:tagline] = tmdb_data["tagline"]
       end
       
       if tmdb_data.key?("genres")
         tmdb_genres = tmdb_data["genres"].map { |v| v["id"]}.join(",")
         if local_data == nil || tmdb_genres != local_data.genres 
           update_movie_keys.push(:genres)
-          @movie_details[:genres] = tmdb_genres
+          movie_details[:genres] = tmdb_genres
         else
-          @movie_details[:genres] = local_data.genres
+          movie_details[:genres] = local_data.genres
         end
       end
       
       unless tmdb_data["release_dates"]["results"].empty?
-        puts "tmdb_id #{@movie_details[:tmdb]}: tmdb release dates data available"
+        puts "tmdb_id #{movie_details[:tmdb]}: tmdb release dates data available"
         tmdb_data["release_dates"]["results"].each do |v|
           certificate = v["release_dates"].first["certification"]
           if v["iso_3166_1"] == "US" && valid_certificates.include?(certificate) && certificate != local_data.certification 
             update_movie_keys.push(:certification)
-            @movie_details[:certification] = certificate
-            puts "tmdb_id #{@movie_details[:tmdb]}: certificate added from tmdb"
+            movie_details[:certification] = certificate
+            puts "tmdb_id #{movie_details[:tmdb]}: certificate added from tmdb"
           end
         end
       end
     end
     
     # Query omdb api
-    omdb_data = getMovieDetailsOmdb("i=" + @movie_details[:imdb].to_s)
+    omdb_data = movie_details_from_omdb("i=" + movie_details[:imdb].to_s)
     no_omdb_data_flag = false
     if omdb_data["Response"] == "False"
       no_omdb_data_flag = true
-      puts "tmdb_id " + @movie_details[:tmdb].to_s + ": invalid response from omdb api"
+      puts "tmdb_id " + movie_details[:tmdb].to_s + ": invalid response from omdb api"
     else
-      if valid_certificates.include?(omdb_data.key?("Rated")) && omdb_data["Rated"] != local_data.certification && omdb_date["Rated"] != @movie_details[:certification]
-        puts "tmdb_id #{@movie_details[:tmdb]}: omdb release dates data available"
+      if valid_certificates.include?(omdb_data.key?("Rated")) && omdb_data["Rated"] != local_data.certification && omdb_date["Rated"] != movie_details[:certification]
+        puts "tmdb_id #{movie_details[:tmdb]}: omdb release dates data available"
         update_movie_keys.push(:certification)
-        @movie_details[:certification] = omdb_data["Rated"]
-        puts "tmdb_id #{@movie_details[:tmdb]}: certificate added from omdb"
+        movie_details[:certification] = omdb_data["Rated"]
+        puts "tmdb_id #{movie_details[:tmdb]}: certificate added from omdb"
       end
       
       if omdb_data.key?("Director") && full && omdb_data["Director"] != "N/A"
-        @movie_details[:director] = omdb_data["Director"]
+        movie_details[:director] = omdb_data["Director"]
       end
       
       if omdb_data.key?("Writer") && full && omdb_data["Writer"] != "N/A"
-        @movie_details[:writer] = omdb_data["Writer"]
+        movie_details[:writer] = omdb_data["Writer"]
       end
       
       if omdb_data.key?("Actors") && full && omdb_data["Actors"] != "N/A"
-        @movie_details[:cast] = omdb_data["Actors"]
+        movie_details[:cast] = omdb_data["Actors"]
       end
       
       if omdb_data.key?("Plot") && tmdb_data.key?("overview") == false && full && omdb_data["Plot"] != "N/A"
-        @movie_details[:overview] = omdb_data["Plot"]
+        movie_details[:overview] = omdb_data["Plot"]
       end
       
       if omdb_data.key?("Awards") && full && omdb_data["Awards"] != "N/A"
-        @movie_details[:awards] = omdb_data["Awards"]
+        movie_details[:awards] = omdb_data["Awards"]
       end
       
       if omdb_data.key?("Poster") && tmdb_data.key?("poster_path") == false && full && omdb_data["Poster"] != "N/A"
         update_movie_keys.push(:poster_path)
-        @movie_details[:poster_path] = omdb_data["Poster"]
+        movie_details[:poster_path] = omdb_data["Poster"]
       end
       
       if omdb_data.key?("Country") && full && omdb_data["Country"] != "N/A"
-        @movie_details[:country] = omdb_data["Country"]
+        movie_details[:country] = omdb_data["Country"]
       end
       
       if omdb_data.key?("Metascore") && full && omdb_data["Metascore"] != "N/A"
-        @movie_details[:metascore] = omdb_data["Metascore"]
+        movie_details[:metascore] = omdb_data["Metascore"]
       end
       
       if omdb_data.key?("imdbRating") && full && omdb_data["imdbRating"] != "N/A"
-        @movie_details[:imdb_rating] = omdb_data["imdbRating"]
+        movie_details[:imdb_rating] = omdb_data["imdbRating"]
       end
       
     end
     
+    puts local_data.inspect
+    
+    # Query Guidebox
+    no_gb_data_flag = false
+    if local_data.gb_id
+      p "id"
+      movie_details[:gb_id] = local_data.gb_id
+    else
+      p "no id"
+      no_gb_data_flag = true
+      movie_details[:gb_id] = movie_id_from_gb(movie_details[:tmdb].to_s)
+      update_movie_keys.push(:gb_id)
+      puts "Guidebox data"
+      puts movie_details[:gb_id]
+    end
+    gb_data = movie_details_from_gb(movie_details[:gb_id].to_s)
+    puts gb_data
+    if gb_data.key?("subscription_web_sources") && gb_data["subscription_web_sources"] != "N/A"
+      movie_details[:availability_online] = true
+      movie_details[:watch_online] = gb_data["subscription_web_sources"]
+      update_movie_keys.push(:availability_online)
+      puts "Guidebox links"
+      puts movie_details[:watch_online]
+    end
+    
+    
+    
     if new_movie_flag
       record = Movie.new(
-        title: @movie_details[:title],
-        genres: @movie_details[:genres],
-        imdb: @movie_details[:imdb],
-        tmdb: @movie_details[:tmdb],
-        certification: @movie_details[:certification],
+        title: movie_details[:title],
+        genres: movie_details[:genres],
+        imdb: movie_details[:imdb],
+        tmdb: movie_details[:tmdb],
+        certification: movie_details[:certification],
         last_checked: Time.now,
-        release_date: @movie_details[:release_date],
-        poster_path: @movie_details[:poster_path]
+        release_date: movie_details[:release_date],
+        poster_path: movie_details[:poster_path],
+        gb_id: movie_details[:gb_id],
+        availability_online: movie_details[:availability_online]
       )
       record.save!
     elsif update_movie_keys != []
-      update_movie_keys.each do |v|
-        local_data[v] = @movie_details[v]
+      update_movie_keys.each do |key|
+        local_data[key] = movie_details[key]
       end
       local_data[:last_checked] = Time.now
       local_data.save! 
     end
-    p @movie_details.keys
-    return @movie_details
+    p movie_details.keys
+    return movie_details
   end
   
 end

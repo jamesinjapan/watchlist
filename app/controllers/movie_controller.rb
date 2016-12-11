@@ -1,17 +1,12 @@
 class MovieController < ApplicationController
   
   def index
-    
-    # Libraries for JSON
-    require 'net/http' 
-    require 'json' 
-    
     @movie_id = params[:m]
     @current_movie = Movie.find_by(tmdb: @movie_id)
     
-    @movie_details = movieDetailsCreator(@movie_id,true)
+    @movie_details = movie_details_creator(@movie_id,true)
     
-    if @current_movie.tag_keys.exists?
+    if @current_movie && @current_movie.tag_keys
       @keyword_list = @current_movie.tag_keys
     else
       @keyword_list = []
@@ -29,9 +24,6 @@ class MovieController < ApplicationController
       i += 1
     end
     
-    # Prepare plus sign glyphicon span
-    @glyphicon_plus = "<span class='glyphicon glyphicon-plus' aria-hidden='true'></span> "
-
     # Prepare poster array
     @recommendation_list.flatten!
     @recommendation_list.compact!
@@ -60,7 +52,7 @@ class MovieController < ApplicationController
       
       local = Movie.find_by(tmdb: v["id"])
       
-      if local && local.ratings.pluck(:user_id).include?(current_user.id)
+      if user_signed_in? && local && local.ratings.pluck(:user_id).include?(current_user.id)
         p "User Rated"
         next 
       end
@@ -73,7 +65,7 @@ class MovieController < ApplicationController
     
     # Get current user's rating of current movie
     @user_rating = ""
-    if @current_movie.ratings != nil 
+    if @current_movie && @current_movie.ratings
       if user_signed_in? && @current_movie.ratings.find_by(user_id: current_user.id) != nil
         @user_rating = @current_movie.ratings.find_by(user_id: current_user.id) 
       end
@@ -81,7 +73,7 @@ class MovieController < ApplicationController
     
   end
   
-  def submitRating
+  def submit_rating
     # If user is not signed in or parameters are missing, do nothing
     if user_signed_in? || params.empty?
       
@@ -119,6 +111,43 @@ class MovieController < ApplicationController
       end
     end
     params.delete :r
+    # Update user recommendations in another thread
+    update_recommendations_list_in_background(current_user) if user_signed_in?
     redirect_to movie_index_path + "?m=" + params[:m]
+  end
+  
+  # Update user's frontpage welcome list in background to reduce impact on user
+  def update_recommendations_list_in_background(user)
+    if user && user.ratings.count > 0
+      Thread.new do
+        recommendations = []
+      
+        good_ratings = user.ratings.order(id: :desc).where(rating: "2")
+        good_ratings.each do |rating|
+          other_user_rating = Rating.order(id: :desc).where("rating = ? AND movie_id = ? AND user_id <> ?","2",rating.movie_id,user.id).take(20)
+          other_user_rating.each do |other_rating|
+            other_user = User.find(other_rating.user_id).ratings.order(id: :desc).where("rating = ? AND movie_id <> ?","2",rating.movie_id).take(20)
+            if other_user.count > 0
+              recommendations << other_user.map(&:movie_id)
+              break
+            end
+          end
+          recommendations.compact!
+          break if recommendations.count > 50
+        end
+        recommendations = recommendations + DEFAULT_RECOMMENDATIONS
+        recommendations = recommendations.flatten.uniq - user.ratings.pluck(:movie_id)
+        recommended_movies = Movie.where(id: recommendations)
+        recommendations_by_rating = []
+        recommended_movies.each do |movie|
+          all_ratings = movie.ratings
+          recommendations_by_rating.push(id: movie.id, rating: (all_ratings.average(:rating) * 100).to_i) if all_ratings.count > 100
+        end
+        recommendations_by_rating.sort! { |x,y| y[:rating] <=> x[:rating] }
+        user.recommendations = recommendations_by_rating.map { |movie| movie[:id]}[0..9].join(",")
+        user.save!
+      end
+      ActiveRecord::Base.connection.close
+    end
   end
 end

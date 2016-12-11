@@ -1,12 +1,6 @@
 class WelcomeController < ApplicationController
   def index
     
-    require 'net/http' 
-    require 'json' 
-    
-    # Update user recommendations in another thread
-    updateRecommendationsInBackground(current_user)
-    
     # Redirect if movie or search term parameters are available
     if params[:m].present?
       redirect_to movie_index_path + "?m=" + params[:m]
@@ -34,7 +28,6 @@ class WelcomeController < ApplicationController
         @recommendations.push(record)
       end
     end
-    puts @recommendations
     
   end
   
