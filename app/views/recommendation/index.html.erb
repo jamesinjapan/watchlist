@@ -6,8 +6,8 @@
   </div>
   <div class="row">
     <div class="col-xs-12 page-title">
-      <h1>Recommendations based on "<%= @original_movie.title %>"</h1>
-      <p>Page <%= @page %> of <%= @total_pages %> (Total number of results: <%= @recommendation_ids.count %>)</p>
+      <h1>Recommendations based on <%= @based_on.join(", ") %></h1>
+      <p>Page <%= @page %> of <%= @total_pages %> (Total number of results: <%= @recommendation_list_ids.count %>)</p>
       <%= render partial: "shared/search_pages", locals: {current_page: @page, lowest_page: @lowest_page, highest_page: @highest_page, total_pages: @total_pages} %>
     </div>
     <div class="col-xs-12">

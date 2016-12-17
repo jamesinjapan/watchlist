@@ -218,7 +218,7 @@ class ApplicationController < ActionController::Base
         movie_details[:metascore] = omdb_data["Metascore"]
       end
       
-      if omdb_data.key?("imdbRating") &&  omdb_data["imdbRating"] != local_data.imdb_rating
+      if omdb_data.key?("imdbRating") && ((omdb_data["imdbRating"] != local_data.imdb_rating) if local_data.try(:imdb_rating))
         update_movie_keys.push(:imdb_rating)
         movie_details[:imdb_rating] = omdb_data["imdbRating"]
       end
@@ -229,7 +229,7 @@ class ApplicationController < ActionController::Base
     
     # Query Guidebox
     no_gb_data_flag = false
-    if local_data.gb_id != nil
+    if local_data.try(:gb_id)
       p "id"
       movie_details[:gb_id] = local_data.gb_id
     else
@@ -276,6 +276,14 @@ class ApplicationController < ActionController::Base
     end
     p movie_details.keys
     return movie_details
+  end
+  
+  def include_adult?(signed_in,user)
+    if signed_in && user.adult_flag
+      return true
+    else 
+      return false
+    end
   end
   
 end

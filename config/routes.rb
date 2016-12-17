@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   get 'movie/submit-rating' => 'movie#submit_rating'
   get 'movie/add_to_watchlist' => 'movie#add_to_watchlist'
   get 'movie/remove_from_watchlist' => 'movie#remove_from_watchlist'
+  get 'movie/update_recommendations_list_in_background' => 'movie#update_recommendations_list_in_background'
 
   get 'search/index'
   post 'search/index'

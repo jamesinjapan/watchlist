@@ -12,11 +12,13 @@ class MovieController < ApplicationController
       @keyword_list = []
     end
     
+    include_adult = include_adult?(user_signed_in?,current_user)
+    
     # Get JSON data from tmdb
     i = 1
     @recommendation_list = []
     3.times do
-      url = "https://api.themoviedb.org/3/movie/" + @movie_id + "/similar?api_key=" + TMDB_API_KEY + "&page=" + i.to_s
+      url = "https://api.themoviedb.org/3/movie/" + @movie_id + "/recommendations?api_key=" + TMDB_API_KEY + "&page=" + i.to_s
       uri = URI(url) 
       response = Net::HTTP.get(uri)
       m = JSON.parse(response)
@@ -30,6 +32,7 @@ class MovieController < ApplicationController
     @recommendation_list.sort! { |x,y| y["popularity"] <=> x["popularity"] }
     @recommendation_list.uniq! { |v| v["id"] }
     @recommendation_list.delete_if { |v| v["poster_path"] == nil } 
+    @recommendation_list.delete_if { |v| include_adult == false && ["G","PG","PG-13"].include?(v["certification"]) == false } 
     
     user_rated_tmdb = []
     
@@ -156,32 +159,53 @@ class MovieController < ApplicationController
   end
   
   # Update user's frontpage welcome list in background to reduce impact on user
-  def update_recommendations_list_in_background(user)
-    if user && user.ratings.count > 0
-      Thread.new do
-        recommendations = []
-        good_ratings = user.ratings.order(id: :desc).where(rating: "2")
-        good_ratings += user.watchlist
-        good_ratings.flatten.each do |rating|
-          other_user_rating = Rating.order(id: :desc).where("rating = ? AND movie_id = ? AND user_id <> ?","2",rating.movie_id,user.id).take(20)
-          other_user_rating.each do |other_rating|
-            other_user = User.find(other_rating.user_id).ratings.order(id: :desc).where("rating = ? AND movie_id <> ?","2",rating.movie_id).take(20)
-            if other_user.count > 0
-              recommendations << other_user.map(&:movie_id)
-              break
-            end
-          end
-          recommendations.compact!
-          break if recommendations.count > 50
-        end
-        recommendations = recommendations + DEFAULT_RECOMMENDATIONS
-        recommendations = recommendations.flatten.uniq - user.ratings.pluck(:movie_id)
-        recommended_movies = Movie.where(id: recommendations)
-        recommended_movies.sort! { |x,y| y.imdb_rating.to_f <=> x.imdb_rating.to_f }
-        user.recommendations = recommendations_by_rating.map { |movie| movie[:id]}[0..9].join(",")
-        user.save!
-      end
-      ActiveRecord::Base.connection.close
+  def update_recommendations_list_in_background(*args)
+    if args[0].present? && args[0].kind_of?(User)
+      user = args[0]
+    elsif params[:u].present?  
+      user = User.find(params[:u]) if params[:u].present?
+    else
+      return 0
     end
+    
+    if user && user.ratings.count > 0
+      include_adult = include_adult?(true,user)
+      recommendations_list = []
+      good_ratings = user.ratings.order(id: :desc).where(rating: "2")
+      good_ratings = good_ratings + user.watchlist.split(",") if user.watchlist != nil
+      good_ratings.each do |rating|
+        other_user_rating = Rating.order(id: :desc).where("rating = ? AND movie_id = ? AND user_id <> ?","2",rating.movie_id,user.id).take(20)
+        other_user_rating.each do |other_rating|
+          other_user = User.find(other_rating.user_id).ratings.order(id: :desc).where("rating = ? AND movie_id <> ?","2",rating.movie_id).take(20)
+          if other_user.count > 0
+            recommendations_list << other_user.map(&:movie_id)
+            break
+          end
+        end
+        recommendations_list.compact!
+        break if recommendations_list.count > 50
+      end 
+      recommendations_list = recommendations_list + DEFAULT_RECOMMENDATIONS
+      recommendations_list = recommendations_list.flatten.uniq - user.ratings.pluck(:movie_id)
+      puts "Recommendations: " + recommendations_list.uniq.to_s
+      recommendations_details = Movie.where(id: recommendations_list.uniq)
+      puts "Recommendations: " + recommendations_details[0..9].inspect
+      recommendations = Array.new
+      recommendations_details.each do |movie| 
+        p movie.imdb_rating
+        p movie.certification
+        if ["G","PG","PG-13"].include?(movie.certification) && include_adult == false
+          next
+        end
+        recommendations.push(movie) 
+      end
+      recommendations.sort! { |x,y| y.imdb_rating.to_f <=> x.imdb_rating.to_f }
+      puts "Recommendations: " + recommendations.to_s
+      user.recommendations = recommendations.map { |movie| movie[:id]}[0..9].join(",")
+      user.save!
+    end
+    redirect_to root_path
   end
+  
+  
 end

@@ -6,6 +6,14 @@ class RecommendationController < ApplicationController
     @page = params[:p].to_i if params[:p].present?
     p @page
     # Build list of movie ids to recommend based on parameters given
+    
+    @based_on = Array.new
+    if @keywords != nil
+      @based_on = @based_on + TagKey.where(id: @keywords).pluck(:tag_text)
+    end
+    if @genres != nil
+      @genres.each { |v| @based_on.push(TMDB_GENRE_LIST.select { |g| g["id"] == v.to_i }[0]["name"]) }
+    end
 
     @recommendation_list = []
     keyword_recommendations = []
@@ -45,7 +53,7 @@ class RecommendationController < ApplicationController
     if recommendations_full.include?(params[:m])
       recommendations_full.delete(params[:m])
     end
-
+    params.delete(:m)
     
     # Move movies matching multiple criteria to front of list
     
@@ -68,8 +76,22 @@ class RecommendationController < ApplicationController
       @recommendation_ids = @recommendation_ids - user_rated
     end
     
+    # Return movie data
+    include_adult = include_adult?(user_signed_in?,current_user)
+    @recommendation_list = []
+    @recommendation_list_ids = []
+    @recommendation_ids.each do |v| 
+      p v
+      r = Movie.find(v)
+      if r.title == nil || (include_adult == false && ["G","PG","PG-13"].include?(r.certification) == false)
+        next
+      end
+      @recommendation_list.push(r)
+      @recommendation_list_ids.push(r.id)
+    end
+    
     # Paginate
-    @total_pages = @recommendation_ids.count / 10
+    @total_pages = @recommendation_list_ids.count / 12
     @total_pages = 1000 if @total_pages > 1000
     @total_pages = 1 if @total_pages == 0
     
@@ -85,19 +107,8 @@ class RecommendationController < ApplicationController
     lower_bound = (@page * 12) - 12
     upper_bound = (@page * 12) - 1
     
-    @recommendation_ids = @recommendation_ids[lower_bound..upper_bound]
-    
-    # Return movie data
-    
-    @recommendation_list = []
-    @recommendation_ids.each do |v| 
-      p v
-      r = Movie.find(v)
-      if r.title == nil
-        next
-      end
-      @recommendation_list.push(r)
-    end
+    @recommendation_ids = @recommendation_list_ids[lower_bound..upper_bound]
+    @recommendation_list = @recommendation_list[lower_bound..upper_bound]
     
   end
 end

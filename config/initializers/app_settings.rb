@@ -1,5 +1,5 @@
 # Set API Key
-TMDB_API_KEY = "553017e076c2ecd01b7bf9cdd20a6360"
+TMDB_API_KEY = ApiKey.find_by(service_name: "tmdb").key
 
 # Get image config data from tmdb
 url = "https://api.themoviedb.org/3/configuration?api_key=" + TMDB_API_KEY
@@ -34,8 +34,11 @@ TMDB_GENRE_LIST = results["genres"]
 
 # Default recommendation list
 
-DEFAULT_RECOMMENDATIONS = Rating.order(id: :desc).where(rating: "2").first(50).map(&:movie_id)
+recommendation_ids = Rating.order(id: :desc).where(rating: "2").first(50).map(&:movie_id)
+recommendations = Movie.find(recommendation_ids)
+DEFAULT_RECOMMENDATIONS = Array.new
+recommendations.each { |movie| DEFAULT_RECOMMENDATIONS.push(movie.id) if ["G","PG","PG-13"].include?(movie.certification) }
 
 # Guidebox 
 
-GB_API_KEY = "rKJ2njMy7RSXuo5aNJf88mO7uNhuUksN"
+GB_API_KEY = ApiKey.find_by(service_name: "gb").key

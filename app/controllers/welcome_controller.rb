@@ -8,12 +8,14 @@ class WelcomeController < ApplicationController
       redirect_to search_index_path + "?t=" + params[:t]
     end
     
+    include_adult = include_adult?(user_signed_in?,current_user)
+    
     @recommendations = Array.new
     
-    if user_signed_in?
+    if user_signed_in? && current_user.recommendations != nil
       @recommendations = Movie.where(id: current_user.recommendations.split(","))
     else
-      url = "https://api.themoviedb.org/3/discover/movie?api_key=" + TMDB_API_KEY + "&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&release_date.lte=" + (Time.now - 1.year).strftime("%Y-%m-%d") + "&page=1"
+      url = "https://api.themoviedb.org/3/discover/movie?api_key=" + TMDB_API_KEY + "&language=en-US&sort_by=popularity.desc&include_adult=" + include_adult.to_s + "&include_video=false&release_date.lte=" + (Time.now - 1.year).strftime("%Y-%m-%d") + "&page=1"
       uri = URI(url) 
       response = Net::HTTP.get(uri)
       result = JSON.parse(response)

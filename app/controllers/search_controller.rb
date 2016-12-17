@@ -4,12 +4,14 @@ class SearchController < ApplicationController
       redirect_to movie_index_path + "?m=" + params[:m]
     end
     
+    include_adult = include_adult?(user_signed_in?,current_user)
+    
     # Set current page
     @current_page = params[:p].to_i
     @current_page = 1 if params[:p] == nil
     
     # Get JSON data from tmdb
-    url = "https://api.themoviedb.org/3/search/movie?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US&query=" + params[:t] + "&page=" + @current_page.to_s
+    url = "https://api.themoviedb.org/3/search/movie?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US&include_adult=" + include_adult.to_s + "&query=" + params[:t] + "&page=" + @current_page.to_s
     uri = URI(url) 
     response = Net::HTTP.get(uri)
     @results = JSON.parse(response) 
@@ -51,7 +53,9 @@ class SearchController < ApplicationController
   def movie_title_autocomplete_remote
     movietitle_hash = []
     
-    url = "https://api.themoviedb.org/3/search/movie?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US&query=" + params[:t]
+    include_adult = include_adult?(user_signed_in?,current_user)
+    
+    url = "https://api.themoviedb.org/3/search/movie?api_key=553017e076c2ecd01b7bf9cdd20a6360&language=en-US&include_adult=" + include_adult.to_s + "&query=" + params[:t]
     uri = URI(url) 
     response = Net::HTTP.get(uri)
     results = JSON.parse(response) 
