@@ -138,12 +138,7 @@ class MovieController < ApplicationController
         recommendations = recommendations + DEFAULT_RECOMMENDATIONS
         recommendations = recommendations.flatten.uniq - user.ratings.pluck(:movie_id)
         recommended_movies = Movie.where(id: recommendations)
-        recommendations_by_rating = []
-        recommended_movies.each do |movie|
-          all_ratings = movie.ratings
-          recommendations_by_rating.push(id: movie.id, rating: (all_ratings.average(:rating) * 100).to_i) if all_ratings.count > 100
-        end
-        recommendations_by_rating.sort! { |x,y| y[:rating] <=> x[:rating] }
+        recommended_movies.sort! { |x,y| y.imdb_rating.to_f <=> x.imdb_rating.to_f }
         user.recommendations = recommendations_by_rating.map { |movie| movie[:id]}[0..9].join(",")
         user.save!
       end

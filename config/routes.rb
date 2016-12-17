@@ -17,6 +17,8 @@ Rails.application.routes.draw do
   get 'welcome/index'
   post 'welcome/index'
   
+  get 'welcome/update' => 'welcome#update_db'
+  
   root 'welcome#index'
 
   # The priority is based upon order of creation: first created -> highest priority.

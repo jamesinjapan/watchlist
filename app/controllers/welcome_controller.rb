@@ -31,4 +31,9 @@ class WelcomeController < ApplicationController
     
   end
   
+  def update_db
+    movie_details_creator(params[:m], true)  
+    redirect_to movie_index_path + "?m=" + params[:m]
+  end
+  
 end

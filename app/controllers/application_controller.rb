@@ -85,6 +85,9 @@ class ApplicationController < ActionController::Base
       if local_data.poster_path != nil
         movie_details[:poster_path] = local_data.poster_path
       end
+      if local_data.imdb_rating != nil
+        movie_details[:imdb_rating] = local_data.imdb_rating
+      end
     end
     
     # Query tmdb api
@@ -214,7 +217,8 @@ class ApplicationController < ActionController::Base
         movie_details[:metascore] = omdb_data["Metascore"]
       end
       
-      if omdb_data.key?("imdbRating") && full && omdb_data["imdbRating"] != "N/A"
+      if omdb_data.key?("imdbRating") &&  omdb_data["imdbRating"] != local_data.imdb_rating
+        update_movie_keys.push(:imdb_rating)
         movie_details[:imdb_rating] = omdb_data["imdbRating"]
       end
       
@@ -224,7 +228,7 @@ class ApplicationController < ActionController::Base
     
     # Query Guidebox
     no_gb_data_flag = false
-    if local_data.gb_id
+    if local_data.gb_id != nil
       p "id"
       movie_details[:gb_id] = local_data.gb_id
     else
@@ -258,7 +262,8 @@ class ApplicationController < ActionController::Base
         release_date: movie_details[:release_date],
         poster_path: movie_details[:poster_path],
         gb_id: movie_details[:gb_id],
-        availability_online: movie_details[:availability_online]
+        availability_online: movie_details[:availability_online],
+        imdb_rating: movie_details[:imdb_rating]
       )
       record.save!
     elsif update_movie_keys != []
