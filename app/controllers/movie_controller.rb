@@ -159,15 +159,7 @@ class MovieController < ApplicationController
   end
   
   # Update user's frontpage welcome list in background to reduce impact on user
-  def update_recommendations_list_in_background(*args)
-    if args[0].present? && args[0].kind_of?(User)
-      user = args[0]
-    elsif params[:u].present?  
-      user = User.find(params[:u]) if params[:u].present?
-    else
-      return 0
-    end
-    
+  def update_recommendations_list_in_background(user)
     if user && user.ratings.count > 0
       include_adult = include_adult?(true,user)
       recommendations_list = []
@@ -204,7 +196,6 @@ class MovieController < ApplicationController
       user.recommendations = recommendations.map { |movie| movie[:id]}[0..9].join(",")
       user.save!
     end
-    redirect_to root_path
   end
   
   
