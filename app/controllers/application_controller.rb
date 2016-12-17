@@ -71,6 +71,7 @@ class ApplicationController < ActionController::Base
     if local_data == nil
       new_movie_flag = true
     else
+      movie_details[:id] = local_data.id
       if full
         if local_data.ratings.empty?
           movie_details[:avg_user_rating] = "Not rated yet!"

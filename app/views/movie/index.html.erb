@@ -128,12 +128,42 @@
               <%= link_to "Sign in", new_user_session_path %> or <%= link_to "sign up", new_user_registration_path %> to rate this movie.
             <% end %>
           </div>
+          <div class="movie-details">
+            <% if user_signed_in? && @user_rating == "" && (current_user.watchlist == nil || !(current_user.watchlist.include?(@movie_details[:id].to_s))) %>
+              <form action="<%= movie_add_to_watchlist_path %>" method="get" name="addtowatchlistform">
+                <fieldset class="col-xs-12 content-btns">
+                  <legend>Watchlist</legend>
+                  <%= hidden_field_tag :m, params[:m], :id => "movie-id", :value => @movie_details[:tmdb] %>
+                  <%= button_tag type:"submit", class: "btn btn-primary btn-watchlist", name: :id, value: @movie_details[:id] do %>
+                    <span class="glyphicon glyphicon-plus"></span> Add to Watchlist
+                  <% end %> 
+                </fieldset>
+              </form>  
+            <% elsif @user_rating != "" %>
+              <legend>Watchlist</legend>
+              You have already seen this movie. 
+            <% elsif current_user.watchlist.include?(@movie_details[:id].to_s) %>
+              <form action="<%= movie_remove_from_watchlist_path %>" method="get" name="removefromwatchlistform">
+                <fieldset class="col-xs-12 content-btns">
+                  <legend>Watchlist</legend>
+                  <%= hidden_field_tag :m, params[:m], :id => "movie-id", :value => @movie_details[:tmdb] %>
+                  <%= button_tag type:"submit", class: "btn btn-primary btn-watchlist", name: :id, value: @movie_details[:id] do %>
+                    <span class="glyphicon glyphicon-remove"></span> Remove from Watchlist
+                  <% end %> 
+                </fieldset>
+              </form> 
+            <% else %>
+              <legend>Watchlist</legend>
+              <%= link_to "Sign in", new_user_session_path %> or <%= link_to "sign up", new_user_registration_path %> to add this movie to your watchlist.
+            <% end %>
+          </div>
         </div>
       <% end %>
       <div class="row">
         <div class="col-xs-12 movie-details">
           <legend>Synopsis</legend>
           <div class="content">
+            <%= current_user.watchlist %>
             <%= @movie_details.key?(:overview) && @movie_details[:overview] != "" ? @movie_details[:overview] : "Synopsis unavailable." %>
           </div>
         </div>

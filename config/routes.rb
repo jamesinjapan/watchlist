@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   post 'movie/index'
   
   get 'movie/submit-rating' => 'movie#submit_rating'
+  get 'movie/add_to_watchlist' => 'movie#add_to_watchlist'
+  get 'movie/remove_from_watchlist' => 'movie#remove_from_watchlist'
 
   get 'search/index'
   post 'search/index'

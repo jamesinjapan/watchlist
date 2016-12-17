@@ -116,14 +116,53 @@ class MovieController < ApplicationController
     redirect_to movie_index_path + "?m=" + params[:m]
   end
   
+  # Add movie to the user's watchlist
+  def add_to_watchlist
+    # If user is not signed in or parameters are missing, do nothing
+    if user_signed_in? && params[:id].present?
+      if current_user.watchlist.kind_of?(Array) == false
+        current_user.watchlist = params[:id].to_i
+      else
+        current_user.watchlist.push("," + params[:id].to_i)
+      end
+      current_user.save!
+      puts "Record updated"
+    else
+      flash[:danger] = "Error adding to watchlist"
+      redirect_to movie_index_path + "?m=" + params[:m]
+    end
+    
+    # Update user recommendations in another thread
+    update_recommendations_list_in_background(current_user) if user_signed_in?
+    redirect_to movie_index_path + "?m=" + params[:m]
+  end
+  
+  def remove_from_watchlist
+    # If user is not signed in or parameters are missing, do nothing
+    if user_signed_in? && params[:id] != nil && current_user.watchlist != nil
+      if current_user.watchlist.include?(",")
+        current_user.watchlist = current_user.watchlist.split(",").delete(params[:id]).join(",")
+      else 
+        current_user.watchlist = nil if current_user.watchlist == params[:id]
+      end
+      current_user.save!
+      puts "Record updated"
+      update_recommendations_list_in_background(current_user)
+    else
+      flash[:danger] = "Error removing from watchlist"
+    end
+    
+    redirect_to movie_index_path + "?m=" + params[:m]
+  end
+  
   # Update user's frontpage welcome list in background to reduce impact on user
   def update_recommendations_list_in_background(user)
     if user && user.ratings.count > 0
       Thread.new do
         recommendations = []
-      
         good_ratings = user.ratings.order(id: :desc).where(rating: "2")
-        good_ratings.each do |rating|
+        good_ratings += user.watchlist
+        good_ratings.flatten.each do |rating|
           other_user_rating = Rating.order(id: :desc).where("rating = ? AND movie_id = ? AND user_id <> ?","2",rating.movie_id,user.id).take(20)
           other_user_rating.each do |other_rating|
             other_user = User.find(other_rating.user_id).ratings.order(id: :desc).where("rating = ? AND movie_id <> ?","2",rating.movie_id).take(20)
