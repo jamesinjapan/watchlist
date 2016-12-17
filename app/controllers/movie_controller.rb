@@ -32,7 +32,6 @@ class MovieController < ApplicationController
     @recommendation_list.sort! { |x,y| y["popularity"] <=> x["popularity"] }
     @recommendation_list.uniq! { |v| v["id"] }
     @recommendation_list.delete_if { |v| v["poster_path"] == nil } 
-    @recommendation_list.delete_if { |v| include_adult == false && ["G","PG","PG-13"].include?(v["certification"]) == false } 
     
     user_rated_tmdb = []
     
@@ -54,13 +53,14 @@ class MovieController < ApplicationController
       end
       
       local = Movie.find_by(tmdb: v["id"])
-      
       if user_signed_in? && local && local.ratings.pluck(:user_id).include?(current_user.id)
         p "User Rated"
         next 
       end
       if local
-        @recommendations.push(poster_path: local.poster_path, title: local.title, release_date: local.release_date, tmdb: local.tmdb)
+        if (include_adult == false && ["G","PG","PG-13"].include?(local.certification) == true) || include_adult
+          @recommendations.push(poster_path: local.poster_path, title: local.title, release_date: local.release_date, tmdb: local.tmdb) 
+        end
       else
         @recommendations.push(poster_path: TMDB_IMG_BASE + TMDB_POSTER_SIZES[3] + v["poster_path"], title: v["title"], release_date: v["release_date"], tmdb: v["id"])
       end
@@ -186,7 +186,7 @@ class MovieController < ApplicationController
       recommendations_details.each do |movie| 
         p movie.imdb_rating
         p movie.certification
-        if ["G","PG","PG-13"].include?(movie.certification) && include_adult == false
+        if ["G","PG","PG-13"].include?(movie.certification) == false && include_adult == false
           next
         end
         recommendations.push(movie) 
