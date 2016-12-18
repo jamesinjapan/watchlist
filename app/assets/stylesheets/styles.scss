@@ -424,3 +424,25 @@ fieldset label {
   text-align: justify;
 }
 
+.caption {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 9999;
+	margin: 100% 0 0 0;
+	background: rgb(0, 0, 0); /* fallback color */
+  background: rgba(0, 0, 0, 0.9);
+  padding: 10px; 
+}
+
+.caption i {
+  color: #fff;
+	text-shadow: 2px 2px 0px #000;
+	font-size: 100px;
+}
+
+.field_with_errors {
+  color: #c9302c;
+  display: inline;
+}

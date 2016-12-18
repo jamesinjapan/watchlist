@@ -13,17 +13,35 @@
 <div class="container main-body">
   <div class="row">
     <div class="col-xs-12 page-title">
+<% if user_signed_in? && current_user.watchlist != nil && current_user.watchlist.split(",").count > 5 %>
+        <h1>Watch something from your WatchList tonight</h1>
+      <%= raw "<p>Sign up above and rate movies to help customize your recommendations</p>" unless user_signed_in? %>
+    </div>
+  </div>
+</div>
+  <% watchlist = Movie.where(id: current_user.watchlist.split(",")) %>
+  <div class="container-fluid">
+    <div class="owl-carousel">
+      <% watchlist.shuffle[0..9].each do |v| %>
+        <div class="item">
+          <%= link_to image_tag(v.poster_path, :class => "img-responsive", :alt =>  "#{v.title} #{v.release_date}"), movie_index_path(:m => v.tmdb) %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
       <h1>Have you seen these movies?</h1>
       <%= raw "<p>Sign up above and rate movies to help customize your recommendations</p>" unless user_signed_in? %>
     </div>
   </div>
 </div>
 <div class="container-fluid">
-  <div class="owl-carousel">
-    <% @recommendations[0..9].each_with_index do |v,i| %>
-      <div>
-        <%= link_to image_tag(v[:poster_path], :class => "img-responsive", :alt =>  "#{v[:title]} #{v[:release_date]}"), movie_index_path(:m => v[:tmdb]) %>
-      </div>
-    <% end %>
+    <div class="owl-carousel">
+      <% @recommendations[0..9].each_with_index do |v,i| %>
+        <div>
+          <%= link_to image_tag(v[:poster_path], :class => "img-responsive", :alt =>  "#{v[:title]} #{v[:release_date]}"), movie_index_path(:m => v[:tmdb]) %>
+        </div>
+      <% end %>
+    </div>
   </div>
-</div>
+<% end %>

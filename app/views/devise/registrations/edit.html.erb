@@ -1,49 +1,105 @@
-<div class="container main-body">
-  <div class="row">
-    <div class="col-xs-12 col-sm-offset-2 col-sm-8"> 
-      <h2>Edit <%= resource_name.to_s.humanize %></h2>
-
+<div class="container main-body">  
+   <div class="movie-sheet row-eq-height">
+    <div class="movie-details-div">
+      <div class="row row-eq-height">
+        <div class="movie-details">
+          <h1>Your User Details</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="movie-sheet row-eq-height">
+    <div class="movie-details-div">
       <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
         <%= devise_error_messages! %>
-        
-        <div class="field">
-          <%= f.label :email %><br />
-          <%= f.email_field :email %>
+        <div class="row row-eq-height">
+          <div class="movie-details">
+            <legend>Email address</legend>
+            <div class="content form-group">
+              <%= f.label :email, "Your registered email address" %>
+              <%= f.email_field :email, class: "form-control", value: current_user.email  %>
+              <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+                <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
+              <% end %>
+            </div>
+          </div>
+          <div class="movie-details">
+            <legend>Mature movies</legend>
+            <div class="content form-group">
+              <%= f.label :adult_flag, "Do you want to see movies rated R and up in your results?" %><br>
+              <%= f.check_box :adult_flag, class: "check-box", checked: current_user.adult_flag  %>
+            </div>
+          </div>
         </div>
-      
-        <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-          <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
-        <% end %>
-      
-        <div class="field">
-          <%= f.label :password %> <i>(leave blank if you don't want to change it)</i><br />
-          <%= f.password_field :password, autocomplete: "off" %>
-          <% if @minimum_password_length %>
-            <br />
-            <em><%= @minimum_password_length %> characters minimum</em>
+        <div class="row row-eq-height">
+          <div class="movie-details">
+            <legend>Password</legend>
+            <div class="content form-group">
+              <%= f.label :password, "Enter a new password" %><br /><small>(leave blank if you don't want to change it)</small>
+              <%= f.password_field :password, autocomplete: "off", class: "form-control" %>
+              <% if @minimum_password_length %>
+                <em><%= @minimum_password_length %> characters minimum</em>
+              <% end %>
+            </div>
+          </div>
+          <div class="movie-details">
+            <legend>Password Confirmation</legend>
+            <div class="content form-group">
+              <%= f.label :password_confirmation, "Confirm your new password" %><br /><small>(leave blank if you don't want to change your password)</small>
+              <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control" %>
+            </div>
+          </div>
+          <div class="movie-details">
+            <legend>Current Password</legend>
+            <div class="content form-group">
+              <%= f.label :current_password, "Confirm changes with your current password" %><br /><small>(we need your current password to confirm your changes)</small>
+              <%= f.password_field :current_password, autocomplete: "off", class: "form-control" %>
+            </div>
+          </div>
+        </div>
+        <div class="row row-eq-height">
+          <div class="movie-details">
+            <legend>Confirm Changes</legend>
+            <%= f.submit "Update", class: "btn btn-primary" %>
+          </div>
+        <% end %> 
+        <div class="movie-details">
+          <legend>Unhappy?</legend>
+          <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete, class: "btn btn-danger" %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% rated_movies = Rating.where(user_id: current_user.id).order(id: :desc) %>
+  <div class="movie-sheet row-eq-height">
+    <div class="movie-details-div">
+      <div class="row row-eq-height">
+        <div class="movie-details col-xs-12">
+          <legend>Movies you have rated</legend>
+          <div class="content">
+            You can change your ratings on the movie page by clicking the poster.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="owl-carousel">
+    <% rated_movies.each do |v| %>
+      <div class="item">
+        <%= link_to image_tag(v.movie.poster_path, :class => "img-responsive", :alt =>  "#{v.movie.title} #{v.movie.release_date}"), movie_index_path(:m => v.movie.tmdb) %>
+        <div class="caption text-center">
+          <h4><%= "#{v.movie.title} (#{v.movie.release_date.year})" %></h4>
+          <% if v.rating == "2" %>
+            <i class="material-icons">sentiment_very_satisfied</i>
+          <% elsif v.rating == "0" %>
+            <i class="material-icons">sentiment_very_dissatisfied</i>
+          <% else %>
+            <i class="material-icons">sentiment_neutral</i>
           <% end %>
         </div>
-      
-        <div class="field">
-          <%= f.label :password_confirmation %><br />
-          <%= f.password_field :password_confirmation, autocomplete: "off" %>
-        </div>
-      
-        <div class="field">
-          <%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i><br />
-          <%= f.password_field :current_password, autocomplete: "off" %>
-        </div>
-      
-        <div class="actions">
-          <%= f.submit "Update", class: "btn btn-primary" %>
-        </div>
-      <% end %>
-      
-      <h3>Cancel my account</h3>
-      
-      <p>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete %></p>
-      
-      <%= link_to "Back", :back %>
-    </div>
+      </div>
+    <% end %>
   </div>
 </div>

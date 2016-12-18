@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   get 'recommendation/index'
-
+  
   get 'movie/index'
   post 'movie/index'
   

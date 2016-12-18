@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def configure_permitted_parameters
-    added_attrs = [:email, :password, :password_confirmation, :remember_me]
+    added_attrs = [:email, :password, :password_confirmation, :remember_me, :adult_flag]
     devise_parameter_sanitizer.permit :sign_up, keys: added_attrs
     devise_parameter_sanitizer.permit :account_update, keys: added_attrs
   end
@@ -28,7 +28,6 @@ class ApplicationController < ActionController::Base
     url = "https://www.omdbapi.com/?" + imdb_id
     uri = URI(url) 
     response = Net::HTTP.get(uri)
-    puts response.force_encoding("UTF-8").to_json
     return JSON.parse(response)
   end
   
@@ -44,7 +43,6 @@ class ApplicationController < ActionController::Base
   # Return Guidebox movie details from external Guidebox API
   def movie_details_from_gb(gb_id)
     url = "https://api-public.guidebox.com/v1.43/US/" + GB_API_KEY + "/movie/" + gb_id
-    p url
     uri = URI(url) 
     response = Net::HTTP.get(uri)
     return JSON.parse(response)
@@ -230,24 +228,17 @@ class ApplicationController < ActionController::Base
     # Query Guidebox
     no_gb_data_flag = false
     if local_data.try(:gb_id)
-      p "id"
       movie_details[:gb_id] = local_data.gb_id
     else
-      p "no id"
       no_gb_data_flag = true
       movie_details[:gb_id] = movie_id_from_gb(movie_details[:tmdb].to_s)
       update_movie_keys.push(:gb_id)
-      puts "Guidebox data"
-      puts movie_details[:gb_id]
     end
     gb_data = movie_details_from_gb(movie_details[:gb_id].to_s)
-    puts gb_data
     if gb_data.key?("subscription_web_sources") && gb_data["subscription_web_sources"] != "N/A"
       movie_details[:availability_online] = true
       movie_details[:watch_online] = gb_data["subscription_web_sources"]
       update_movie_keys.push(:availability_online)
-      puts "Guidebox links"
-      puts movie_details[:watch_online]
     end
     
     
@@ -274,7 +265,6 @@ class ApplicationController < ActionController::Base
       local_data[:last_checked] = Time.now
       local_data.save! 
     end
-    p movie_details.keys
     return movie_details
   end
   

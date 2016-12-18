@@ -15,7 +15,7 @@
           <li class="navbar-text">
             <div class="row-eq-height">
               <div class="loggedin-grow-text">Signed in as <%= current_user.email %></div>
-              <div class="loggedin-button"><%= button_to "Edit settings", edit_user_registration_path, class: "btn btn-default btn-loggedin" %></div>
+              <div class="loggedin-button"><%= button_to "Edit settings", edit_user_registration_path, method: :get, class: "btn btn-default btn-loggedin" %></div>
               <div class="loggedin-button"><%= button_to "Sign out", destroy_user_session_path, class: "btn btn-danger btn-loggedin", method: :delete %></div>
             </div>
           </li>

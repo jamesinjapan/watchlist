@@ -38,7 +38,6 @@ class MovieController < ApplicationController
     if user_signed_in?
       user_rated = current_user.ratings.pluck(:movie_id)
       user_rated_tmdb = Movie.where(tmdb: user_rated).pluck(:tmdb)
-      p user_rated_tmdb
     end
     
     @recommendations = []
@@ -53,7 +52,7 @@ class MovieController < ApplicationController
       end
       
       local = Movie.find_by(tmdb: v["id"])
-      if user_signed_in? && local && local.ratings.pluck(:user_id).include?(current_user.id)
+      if user_signed_in? && local && (local.ratings.pluck(:user_id).include?(current_user.id) || (current_user.watchlist != nil && current_user.watchlist.split(",").include?(local.id.to_s)))
         p "User Rated"
         next 
       end
@@ -83,7 +82,6 @@ class MovieController < ApplicationController
       # Get movie id from DB
       movie_id = params[:m]
       current_movie = Movie.find_by(tmdb: movie_id)
-      puts "Current Movie: #{current_movie.inspect}"
       
       # Get current user's existing rating record
       if current_movie != nil
@@ -93,7 +91,6 @@ class MovieController < ApplicationController
           end
         end
       end
-      puts "User Rating: #{user_rating.inspect}"
       
       rating = params[:r]
       if rating == "0" || rating == "1" || rating == "2"
@@ -116,17 +113,18 @@ class MovieController < ApplicationController
     params.delete :r
     # Update user recommendations in another thread
     update_recommendations_list_in_background(current_user) if user_signed_in?
-    redirect_to movie_index_path + "?m=" + params[:m]
+    params[:id] = Movie.find_by(tmdb: params[:m]).id.to_s
+    remove_from_watchlist if user_signed_in?
   end
   
   # Add movie to the user's watchlist
   def add_to_watchlist
     # If user is not signed in or parameters are missing, do nothing
     if user_signed_in? && params[:id].present?
-      if current_user.watchlist.kind_of?(Array) == false
-        current_user.watchlist = params[:id].to_i
+      if current_user.watchlist == nil
+        current_user.watchlist = params[:id].to_s
       else
-        current_user.watchlist.push("," + params[:id].to_i)
+        current_user.watchlist += "," + params[:id].to_s
       end
       current_user.save!
       puts "Record updated"
@@ -141,10 +139,14 @@ class MovieController < ApplicationController
   end
   
   def remove_from_watchlist
+    puts "REMOVE FROM WATCHLIST: " + params[:id]
     # If user is not signed in or parameters are missing, do nothing
     if user_signed_in? && params[:id] != nil && current_user.watchlist != nil
       if current_user.watchlist.include?(",")
-        current_user.watchlist = current_user.watchlist.split(",").delete(params[:id]).join(",")
+        watchlist = current_user.watchlist
+        watchlist = watchlist.split(",")
+        watchlist.delete(params[:id])
+        current_user.watchlist = watchlist.join(",")
       else 
         current_user.watchlist = nil if current_user.watchlist == params[:id]
       end
@@ -163,12 +165,12 @@ class MovieController < ApplicationController
     if user && user.ratings.count > 0
       include_adult = include_adult?(true,user)
       recommendations_list = []
-      good_ratings = user.ratings.order(id: :desc).where(rating: "2")
+      good_ratings = user.ratings.order(id: :desc).where(rating: "2").pluck(:movie_id)
       good_ratings = good_ratings + user.watchlist.split(",") if user.watchlist != nil
       good_ratings.each do |rating|
-        other_user_rating = Rating.order(id: :desc).where("rating = ? AND movie_id = ? AND user_id <> ?","2",rating.movie_id,user.id).take(20)
+        other_user_rating = Rating.order(id: :desc).where("rating = ? AND movie_id = ? AND user_id <> ?","2",rating,user.id).take(20)
         other_user_rating.each do |other_rating|
-          other_user = User.find(other_rating.user_id).ratings.order(id: :desc).where("rating = ? AND movie_id <> ?","2",rating.movie_id).take(20)
+          other_user = User.find(other_rating.user_id).ratings.order(id: :desc).where("rating = ? AND movie_id <> ?","2",rating).take(20)
           if other_user.count > 0
             recommendations_list << other_user.map(&:movie_id)
             break
@@ -179,20 +181,15 @@ class MovieController < ApplicationController
       end 
       recommendations_list = recommendations_list + DEFAULT_RECOMMENDATIONS
       recommendations_list = recommendations_list.flatten.uniq - user.ratings.pluck(:movie_id)
-      puts "Recommendations: " + recommendations_list.uniq.to_s
       recommendations_details = Movie.where(id: recommendations_list.uniq)
-      puts "Recommendations: " + recommendations_details[0..9].inspect
       recommendations = Array.new
       recommendations_details.each do |movie| 
-        p movie.imdb_rating
-        p movie.certification
         if ["G","PG","PG-13"].include?(movie.certification) == false && include_adult == false
           next
         end
         recommendations.push(movie) 
       end
       recommendations.sort! { |x,y| y.imdb_rating.to_f <=> x.imdb_rating.to_f }
-      puts "Recommendations: " + recommendations.to_s
       user.recommendations = recommendations.map { |movie| movie[:id]}[0..9].join(",")
       user.save!
     end
