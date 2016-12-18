@@ -1,0 +1,15 @@
+<% if @movie_details[:watch_online] != nil && @movie_details[:watch_online].count > 0 %>
+  <div class="row row-eq-height">
+    <div class="col-xs-12">
+      <legend>Watch Online</legend>
+    </div>
+    <div class="content-btns">
+        <% @movie_details[:watch_online].each do |source| %>
+          <% if source["link"][0..4] = "http:" %>
+            <% source["link"] = "https" + source["link"][4..-1]
+          <% end %>
+          <%= link_to raw("<span class='glyphicon glyphicon-film' aria-hidden='true'></span> ") + source["display_name"], source["link"], class: "btn btn-primary", target: "_blank" %>
+        <% end %>
+    </div>
+  </div>
+<% end %>

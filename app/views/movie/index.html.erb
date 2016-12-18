@@ -29,19 +29,19 @@
         <div class="movie-details">
           <legend>Release date</legend>
           <div class="content">
-            <%= @movie_details.key?(:release_date) ? @movie_details[:release_date] : "Release date data unavailable." %>
+            <%= @movie_details.key?(:release_date) && @movie_details[:release_date] != "" && @movie_details[:release_date] != nil ? @movie_details[:release_date] : "Release date data unavailable." %>
           </div>
         </div>
         <div class="movie-details">
           <legend>Certificate</legend>
           <div class="content">
-            <%= @movie_details.key?(:certification) ? @movie_details[:certification] : "Certificate data unavailable." %>
+            <%= @movie_details.key?(:certification) && @movie_details[:certification] != "" && @movie_details[:certification] != nil ? @movie_details[:certification] : "Certificate data unavailable." %>
           </div>
         </div>
         <div class="movie-details">
           <legend>Runtime</legend>
           <div class="content">
-            <%= @movie_details.key?(:runtime) ? @movie_details[:runtime].to_s + " minutes" : "Runtime data unavailable." %>
+            <%= @movie_details.key?(:runtime)  && @movie_details[:runtime] != "" && @movie_details[:runtime] != nil ? @movie_details[:runtime].to_s + " minutes" : "Runtime data unavailable." %>
           </div>
         </div>
         <div class="movie-details">
@@ -75,7 +75,7 @@
           </div>
         </div>
       </div>
-      <% if @movie_details.key?(:release_date) == false || @movie_details[:release_date].to_datetime < DateTime.now %>
+      <% if @movie_details.key?(:release_date) || @movie_details[:release_date] != nil || @movie_details[:release_date].to_datetime < DateTime.now %>
         <div class="row row-eq-height">
           <div class="movie-details">
             <legend>User Rating</legend>
@@ -190,21 +190,8 @@
           </div>
         </div>
       </div>
-      <% if @movie_details[:watch_online].count > 0 %>
-        <div class="row row-eq-height">
-          <div class="col-xs-12">
-            <legend>Watch Online</legend>
-          </div>
-          <div class="content-btns">
-              <% @movie_details[:watch_online].each do |source| %>
-                <% if source["link"][0..4] = "http:" 
-                  source["link"] = "https" + source["link"][4..-1]
-                end %>
-                <%= link_to raw("<span class='glyphicon glyphicon-film' aria-hidden='true'></span> ") + source["display_name"], source["link"], class: "btn btn-primary", target: "_blank" %>
-              <% end %>
-          </div>
-        </div>
-      <% end %>
+      <!-- BEGIN GUIDEBOX DATA -->
+      <!-- END GUIDEBOX DATA -->
     </div>
   </div>
   <div class="row">

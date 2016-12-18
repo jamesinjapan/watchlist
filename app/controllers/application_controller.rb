@@ -156,8 +156,9 @@ class ApplicationController < ActionController::Base
         end
       end
       
-      unless tmdb_data["release_dates"]["results"].empty?
+      if tmdb_data["release_dates"]["results"].empty?
         puts "tmdb_id #{movie_details[:tmdb]}: tmdb release dates data available"
+      else
         tmdb_data["release_dates"]["results"].each do |v|
           certificate = v["release_dates"].first["certification"]
           if v["iso_3166_1"] == "US" && valid_certificates.include?(certificate) && certificate != local_data.certification 
@@ -216,15 +217,14 @@ class ApplicationController < ActionController::Base
         movie_details[:metascore] = omdb_data["Metascore"]
       end
       
-      if omdb_data.key?("imdbRating") && ((omdb_data["imdbRating"] != local_data.imdb_rating) if local_data.try(:imdb_rating))
+      if omdb_data.key?("imdbRating") && omdb_data["imdbRating"] != local_data.imdb_rating
         update_movie_keys.push(:imdb_rating)
         movie_details[:imdb_rating] = omdb_data["imdbRating"]
       end
       
     end
     
-    puts local_data.inspect
-    
+=begin    
     # Query Guidebox
     no_gb_data_flag = false
     if local_data.try(:gb_id)
@@ -240,7 +240,7 @@ class ApplicationController < ActionController::Base
       movie_details[:watch_online] = gb_data["subscription_web_sources"]
       update_movie_keys.push(:availability_online)
     end
-    
+=end    
     
     
     if new_movie_flag
@@ -253,8 +253,8 @@ class ApplicationController < ActionController::Base
         last_checked: Time.now,
         release_date: movie_details[:release_date],
         poster_path: movie_details[:poster_path],
-        gb_id: movie_details[:gb_id],
-        availability_online: movie_details[:availability_online],
+        # gb_id: movie_details[:gb_id],
+        # availability_online: movie_details[:availability_online],
         imdb_rating: movie_details[:imdb_rating]
       )
       record.save!
