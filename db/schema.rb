@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161217141424) do
+ActiveRecord::Schema.define(version: 20161220112814) do
 
   create_table "api_keys", force: :cascade do |t|
     t.string "service_name"
@@ -77,6 +77,7 @@ ActiveRecord::Schema.define(version: 20161217141424) do
     t.string   "watchlist"
     t.string   "recommendations"
     t.boolean  "adult_flag",             default: false
+    t.string   "hidden_tags"
   end
 
 end

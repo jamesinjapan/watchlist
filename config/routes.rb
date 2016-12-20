@@ -10,7 +10,9 @@ Rails.application.routes.draw do
   get 'movie/add_to_watchlist' => 'movie#add_to_watchlist'
   get 'movie/remove_from_watchlist' => 'movie#remove_from_watchlist'
   get 'movie/update_recommendations_list_in_background' => 'movie#update_recommendations_list_in_background'
-
+  post 'movie/add_keyword_to_movie' => 'movie#add_keyword_to_movie'
+  post 'movie/hide_keyword_from_user' => 'movie#hide_keyword_from_user'
+  
   get 'search/index'
   post 'search/index'
   get 'search/movietitlelookup' => 'search#movie_title_lookup'
