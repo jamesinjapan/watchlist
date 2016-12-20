@@ -162,7 +162,7 @@ class MovieController < ApplicationController
   
   # Update user's frontpage welcome list in background to reduce impact on user
   def update_recommendations_list_in_background(user)
-    if user && user.ratings.count > 0
+    if user && user.ratings.count > 0 && current_user.watchlist.split(",").count <= 5
       include_adult = include_adult?(true,user)
       recommendations_list = []
       good_ratings = user.ratings.order(id: :desc).where(rating: "2").pluck(:movie_id)
