@@ -6,8 +6,8 @@ class MovieController < ApplicationController
     
     @movie_details = movie_details_creator(@movie_id,true)
     
-    if @current_movie && @current_movie.tag_keys
-      @keyword_list = @current_movie.tag_keys
+    if @current_movie && @current_movie.keyword_list != nil
+      @keyword_list = @current_movie.keyword_list
     else
       @keyword_list = []
     end

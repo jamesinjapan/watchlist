@@ -29,6 +29,8 @@ gem "pry"
 gem "devise"
 gem "iso-639"
 gem "rubycritic"
+gem 'acts-as-taggable-on'
+gem "select2-rails"
 
 # Use Unicorn as the app server
 # gem 'unicorn'

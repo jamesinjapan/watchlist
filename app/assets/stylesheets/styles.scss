@@ -329,17 +329,34 @@ fieldset label {
   background-color: #337ab7;
   padding: 5px;
   color: white;
-  border-radius: 2px;
+  border-radius: 5px;
   font-weight: normal;
+  margin-top: -2px;
 }
 
 fieldset label span {
-  margin-left: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-top: -2px;
 }
 
 fieldset label .btn-link {
   color: white;
+  padding-left: 0px;
 }
+
+fieldset label .btn-link:hover {
+  color: white;
+  text-decoration: none;
+}
+
+fieldset label input[type="checkbox"] {
+  vertical-align: middle;
+  margin: -4px 0px 0 5px;
+  padding: 0 5px;
+}
+
+
 
 
 // SEARCH STYLES

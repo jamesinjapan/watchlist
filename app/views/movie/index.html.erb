@@ -213,27 +213,16 @@
             <% end %>
           <% end %>
         </fieldset>
-        <fieldset>
-          <legend>Keywords: </legend>
-          <% @keyword_list.each do |v| %>
-            <label for="checkbox-keywords-<%= v.id %>"><%= v.tag_text %>
-              <%= check_box_tag "k[]", v.id, false, :class => 'checkbox-keywords' %>
-            </label>
-          <% end %>
-        </fieldset>
         <%= hidden_field_tag :m, @movie_details[:tmdb], :id => "movie-id" %>
         <%= submit_tag "Get new recommendations", :class => "btn btn-primary", :name => nil %>
       </form>
-      <form action="<%= movie_add_keyword_to_movie_path %>" method="post" id="add-keyword-form" class="form-inline">
-        <fieldset>
-          <legend>Add new keyword: </legend>
-          <label><span class="glyphicon glyphicon-plus"></span> <%= submit_tag "Add keyword", :class => "btn btn-link", :name => nil %>  
-          <%= text_field_tag :tt, nil, class: "form-control col-xs-3" %></label>
-          <%= hidden_field_tag :m, @movie_details[:tmdb], :id => "movie-id" %>
-          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-          
-        </fieldset>
-      </form>
+      <fieldset>
+        <legend>Keywords: </legend>
+        <% @current_movie.keywords.any? %>
+          <% @current_movie.keywords.each do |tag| %>
+          <%= link_to tag.name, recommendation_index_path(:k => tag.name), class: "btn btn-primary" %>
+        <% end %>
+      </fieldset>
     </div>
   </div>
   <div class="col-xs-12 movie details">

@@ -17,4 +17,5 @@
 //= require owl.carousel
 //= require bootstrap
 //= require ie10-viewport-bug-workaround
+//= require select2-full
 //= require turbolinks

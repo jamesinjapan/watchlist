@@ -1,5 +1,5 @@
 class Movie < ActiveRecord::Base
-  has_many :tags
   has_many :ratings
-  has_many :tag_keys, through: :tags
+  
+  acts_as_taggable_on :keywords
 end

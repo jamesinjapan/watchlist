@@ -155,6 +155,16 @@ class ApplicationController < ActionController::Base
           movie_details[:genres] = local_data.genres
         end
       end
+
+      if tmdb_data.key?("keywords")
+        tmdb_keywords = tmdb_data["keywords"]["keywords"].map { |v| v["name"]}
+        p tmdb_keywords
+        new_keywords = tmdb_keywords - local_data.keyword_list
+        new_keywords.each do |keyword|
+          local_data.keyword_list.add(keyword)
+        end
+        local_data.save! if new_keywords.count != 0
+      end
       
       if tmdb_data["release_dates"]["results"].empty?
         puts "tmdb_id #{movie_details[:tmdb]}: tmdb release dates data available"
