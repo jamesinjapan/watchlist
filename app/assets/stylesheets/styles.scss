@@ -476,3 +476,35 @@ fieldset label input[type="checkbox"] {
   color: #c9302c;
   display: inline;
 }
+
+// TAG CLOUD STYLING
+.tag-cloud {
+  font-size: 14px;
+}
+
+.tag-cloud a {
+  color: white;
+  margin: 2px 5px;
+  line-height: 30px;
+}
+
+.tag-cloud1 { 
+  font-size: 1.0em; 
+  font-weight: 300;
+  margin: 2px;
+}
+
+.tag-cloud2 { 
+  font-size: 1.5em; 
+  font-weight: 400;
+}
+
+.tag-cloud3 { 
+  font-size: 2.0em; 
+  font-weight: 500;
+}
+
+.tag-cloud4 { 
+  font-size: 2.5em; 
+  font-weight: 600;
+}

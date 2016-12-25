@@ -31,6 +31,8 @@ class WelcomeController < ApplicationController
       end
     end
     
+    @tags = Movie.tag_counts_on(:keywords).order(taggings_count: :desc).first(100).sort! { |x,y| x[:name] <=> y[:name] }
+    
   end
   
   def update_db

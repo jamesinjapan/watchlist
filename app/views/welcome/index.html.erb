@@ -13,9 +13,19 @@
 <div class="container main-body">
   <div class="row">
     <div class="col-xs-12 page-title">
+      <h2>Popular keywords</h2>
+      <p>These are top 100 keywords used to describe movies in our database. Click on a keyword to see recommendations.</p>
+    </div>
+    <div class="col-xs-12 tag-cloud text-center">
+      <% tag_cloud(@tags, %w(tag-cloud1 tag-cloud2 tag-cloud3 tag-cloud4)) do |tag, css_class| %>
+        <%= link_to tag.name, recommendation_index_path + "?k=" + tag.id.to_s, :class => css_class %>
+      <% end %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 page-title">
 <% if user_signed_in? && current_user.watchlist != nil && current_user.watchlist.split(",").count > 5 %>
-        <h1>Watch something from your WatchList tonight</h1>
-      <%= raw "<p>Sign up above and rate movies to help customize your recommendations</p>" unless user_signed_in? %>
+      <h2>Watch something from your WatchList tonight</h2>
     </div>
   </div>
 </div>
@@ -30,7 +40,7 @@
     </div>
   </div>
 <% else %>
-      <h1>Have you seen these movies?</h1>
+      <h2>Have you seen these movies?</h2>
       <%= raw "<p>Sign up above and rate movies to help customize your recommendations</p>" unless user_signed_in? %>
     </div>
   </div>
