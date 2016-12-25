@@ -215,7 +215,7 @@
         <legend>Keywords: </legend>
         <% @current_movie.keywords.any? %>
           <% @current_movie.keywords.each do |tag| %>
-          <% next if @current_user.hidden_tags.split(",").include?(tag.id.to_s) %>
+          <% next if @current_user.hidden_tags != nil && @current_user.hidden_tags.split(",").include?(tag.id.to_s) %>
           <button type="button" id="k=<%= tag.id.to_s %>" class="btn btn-primary btn-keyword" data-toggle="button" aria-pressed="false" autocomplete="off">
             <%= tag.name %>
           </button>

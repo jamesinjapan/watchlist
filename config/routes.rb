@@ -24,6 +24,8 @@ Rails.application.routes.draw do
   
   get 'welcome/update' => 'welcome#update_db'
   
+  get 'keyword/unhide_keyword' => 'keyword#unhide_keyword_from_user'
+  
   root 'welcome#index'
 
   # The priority is based upon order of creation: first created -> highest priority.

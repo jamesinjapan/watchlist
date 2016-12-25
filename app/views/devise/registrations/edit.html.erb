@@ -63,6 +63,27 @@
             <%= f.submit "Update", class: "btn btn-primary" %>
           </div>
         <% end %> 
+        <div class="row row-eq-height">
+          <div class="movie-details">
+            <legend>Hidden Keywords</legend>
+            <div class="row row-eq-height">
+              <% if @current_user.hidden_tags != nil %>
+                <div class="col-xs-12 content">
+                  These are the keywords you have requested not to be shown.
+                </div>
+                <% @current_user.hidden_tags.split(",").each do |tag| %>
+                  <div class="movie-details text-center">
+                    <%= ActsAsTaggableOn::Tag.find(tag).name %><br><a class="btn btn-danger btn-xs" href="<%= keyword_unhide_keyword_path + "?k=" + tag.to_s %>"><span class='glyphicon glyphicon-remove'></span> Unhide</a>
+                  </div>
+                <% end %>
+              <% else %>
+                <div class="col-xs-12 content">
+                  You have not requested any keywords be hidden from you.
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
         <div class="movie-details">
           <legend>Unhappy?</legend>
           <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete, class: "btn btn-danger" %>
