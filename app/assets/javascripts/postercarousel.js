@@ -4,7 +4,6 @@ $(document).ready(function() {
     margin: 0,
     nav: false,
     center: true,
-    autoHeight: true,
     autoplay: true,
     autoplayHoverPause: true,
     responsive:{

@@ -75,7 +75,7 @@
           </div>
         </div>
       </div>
-      <% if @movie_details.key?(:release_date) || @movie_details[:release_date] != nil || @movie_details[:release_date].to_datetime < DateTime.now %>
+      <% if @movie_details.key?(:release_date) && @movie_details[:release_date] != nil && @movie_details[:release_date].to_datetime < DateTime.now %>
         <div class="row row-eq-height">
           <div class="movie-details">
             <legend>User Rating</legend>
@@ -203,19 +203,25 @@
       <label>Or find new recommendations by selecting genres and keywords from <%= @movie_details[:title] %>:</label>
       <fieldset>
         <legend>Genres: </legend>
-        <% @movie_details[:genres] != nil %>
+        <% if @movie_details[:genres] != nil %>
           <% @movie_details[:genres].split(",").each do |v| %>
             <% next unless TMDB_GENRE_LIST.map { |g| g["id"] }.include?(v.to_i) %>
             <button type="button" id="g=<%= v.to_s %>" class="btn btn-primary btn-keyword" data-toggle="button" aria-pressed="false" autocomplete="off">
               <%= TMDB_GENRE_LIST.select { |g| g["id"] == v.to_i }[0]["name"]%>
             </button>
+          <% end %>
+        <% else %>
+          No genres listed.
         <% end %>
       </fieldset>
       <fieldset>
         <legend>Keywords: </legend>
+        <% if @current_movie.keywords == nil %>
+          <% @current_movie = Movie.find(movie_details[:id]) %>
+        <% end %>
         <% @current_movie.keywords.any? %>
           <% @current_movie.keywords.each do |tag| %>
-          <% next if @current_user.hidden_tags != nil && @current_user.hidden_tags.split(",").include?(tag.id.to_s) %>
+          <% next if user_signed_in? && @current_user.hidden_tags != nil && @current_user.hidden_tags.split(",").include?(tag.id.to_s) %>
           <button type="button" id="k=<%= tag.id.to_s %>" class="btn btn-primary btn-keyword" data-toggle="button" aria-pressed="false" autocomplete="off">
             <%= tag.name %>
           </button>

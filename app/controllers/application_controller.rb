@@ -95,6 +95,13 @@ class ApplicationController < ActionController::Base
     if tmdb_data.key?("status_code")
       no_tmdb_data_flag = true
       puts "tmdb_id " + movie_details[:tmdb] + ": invalid response from tmdb api"
+      flash[:danger] = "Movie not found"
+      local_data.delete if local_data != nil
+      if request.env["HTTP_REFERER"].present? and request.env["HTTP_REFERER"] != request.env["REQUEST_URI"]
+        redirect_to :back
+      else
+        redirect_to root_path
+      end
     else
       if tmdb_data.key?("backdrop_path") && full
         movie_details[:backdrop_path] = TMDB_IMG_BASE.to_s + TMDB_BACKDROP_SIZES.last.to_s + tmdb_data["backdrop_path"].to_s
@@ -156,14 +163,14 @@ class ApplicationController < ActionController::Base
         end
       end
 
-      if tmdb_data.key?("keywords")
+      if tmdb_data.key?("keywords") && tmdb_data["keywords"] != nil && local_data != nil
         tmdb_keywords = tmdb_data["keywords"]["keywords"].map { |v| v["name"]}
         p tmdb_keywords
         new_keywords = tmdb_keywords - local_data.keyword_list
         new_keywords.each do |keyword|
-          local_data.keyword_list.add(keyword)
+          local_data.keyword_list.add(keyword) if keyword != "" && keyword != nil && !(keyword =~ /\p{Han}|\p{Katakana}|\p{Hiragana}|\p{Hangul}|\p{Cyrillic}/)
         end
-        local_data.save! if new_keywords.count != 0
+        local_data.save! if new_keywords.count > 0
       end
       
       if tmdb_data["release_dates"]["results"].empty?
@@ -227,7 +234,7 @@ class ApplicationController < ActionController::Base
         movie_details[:metascore] = omdb_data["Metascore"]
       end
       
-      if omdb_data.key?("imdbRating") && omdb_data["imdbRating"] != local_data.imdb_rating
+      if omdb_data.key?("imdbRating") && (local_data == nil || omdb_data["imdbRating"] != local_data.imdb_rating)
         update_movie_keys.push(:imdb_rating)
         movie_details[:imdb_rating] = omdb_data["imdbRating"]
       end
@@ -273,6 +280,7 @@ class ApplicationController < ActionController::Base
         local_data[key] = movie_details[key]
       end
       local_data[:last_checked] = Time.now
+      puts local_data.keyword_list
       local_data.save! 
     end
     return movie_details
@@ -286,4 +294,7 @@ class ApplicationController < ActionController::Base
     end
   end
   
+rescue ActionController::RedirectBackError
+  redirect_to root_path
 end
+
