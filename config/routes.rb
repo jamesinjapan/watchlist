@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   get 'movie/remove_from_watchlist' => 'movie#remove_from_watchlist'
   get 'movie/update_recommendations_list_in_background' => 'movie#update_recommendations_list_in_background'
   post 'movie/add_keyword_to_movie' => 'movie#add_keyword_to_movie'
-  post 'movie/hide_keyword_from_user' => 'movie#hide_keyword_from_user'
+  get 'movie/hide_keywords_from_user' => 'movie#hide_keywords_from_user'
   
   get 'search/index'
   post 'search/index'

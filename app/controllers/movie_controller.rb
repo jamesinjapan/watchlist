@@ -200,17 +200,8 @@ class MovieController < ApplicationController
     if user_signed_in?  && params[:m].present? && params[:tt] != "" && params[:tt] != nil
       tag_text = params[:tt]
       movie = Movie.find_by(tmdb: params[:m])
-      user_tag_key = TagKey.find_by(tag_text: tag_text)
-      if user_tag_key == nil
-        user_tag_key = TagKey.new(tag_text: tag_text)
-        user_tag_key.save!
-        user_tag_key = TagKey.find_by(tag_text: tag_text)
-      end
-      puts user_tag_key.inspect
-      puts movie
-      user_tag = Tag.new(tag_key_id: user_tag_key.id, movie_id: movie.id)
-      user_tag.save!
-      
+      movie.keyword_list.add(tag_text)
+      movie.save!
       flash[:success] = "Keyword added to movie"
     elsif user_signed_in? == false
       flash[:warning] = "You must be signed in to add a keyword"
@@ -223,19 +214,22 @@ class MovieController < ApplicationController
     redirect_to :back
   end
   
-  def hide_keyword_from_user
+  def hide_keywords_from_user
+    puts params
     # If user is not signed in or parameters are missing, do nothing
-    if user_signed_in? && params[:tid].present?
-      if current_user.hidden_tags == nil
-        current_user.hidden_tags = params[:tid].to_s
-      else
-        current_user.hidden_tags += "," + params[:tid].to_s
+    if user_signed_in? && params[:k].present?
+      params[:k].each do |id|
+        if current_user.hidden_tags == nil
+          current_user.hidden_tags = id.to_s
+        else
+          current_user.hidden_tags += "," + id.to_s
+        end
+        current_user.save!
+        puts "Record updated"
       end
-      current_user.save!
-      puts "Record updated"
     else
       flash[:danger] = "Error hiding keyword"
-      redirect_to :back
     end
+    redirect_to :back
   end
 end
