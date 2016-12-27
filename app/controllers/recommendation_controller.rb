@@ -1,10 +1,62 @@
 class RecommendationController < ApplicationController
+  def convertDateFilterToDateRange(filter)
+    case filter
+      when "silent"
+        return (1870..1926).to_a
+      when "sound"
+        return (1927..1939).to_a
+      when "1940s"
+        return (1940..1949).to_a
+      when "1950s"
+        return (1950..1959).to_a
+      when "1960s"
+        return (1960..1969).to_a
+      when "1970s"
+        return (1970..1979).to_a
+      when "1980s"
+        return (1980..1989).to_a
+      when "1990s"
+        return (1990..1999).to_a
+      when "2000s"
+        return (2000..2009).to_a
+      when "2010s"
+        return (2010..2019).to_a
+      when "2020s"
+        return (2020..2029).to_a
+    end
+  end
+  
   def index
     @genres = params[:g] if params[:g].present?
     @keywords = params[:k] if params[:k].present?
     @page = 1
     @page = params[:p].to_i if params[:p].present?
     p @page
+    
+    # Build list of years to exclude
+    if params[:d].present?
+      @date_filter = params[:d]
+      year_blacklist = Array.new
+      @date_filter.uniq.each do |date|
+        year_blacklist += convertDateFilterToDateRange(date)
+      end
+    end
+    
+    @include_adult = include_adult?(user_signed_in?,current_user)
+    if params[:c].present?
+      @certificate_filter = params[:c]
+      certificate_whitelist = Array.new
+      
+      if @include_adult == false
+        certificate_whitelist = ["G","PG","PG-13"]
+      else
+        certificate_whitelist = ["G","PG","PG-13","R","NC-17","NR"]
+      end
+      @certificate_filter.each do |cert|
+        certificate_whitelist -= [cert.upcase]
+      end
+    end
+    
     # Build list of movie ids to recommend based on parameters given
     
     @based_on = Array.new
@@ -84,13 +136,13 @@ class RecommendationController < ApplicationController
     end
     
     # Return movie data
-    include_adult = include_adult?(user_signed_in?,current_user)
     @recommendation_list = []
     @recommendation_list_ids = []
     @recommendation_ids.each do |v| 
       p v
       r = Movie.find(v)
-      if r.title == nil || (include_adult == false && ["G","PG","PG-13"].include?(r.certification) == false)
+      puts r.inspect
+      if r.title == nil || r.release_date == nil || (@certificate_filter != nil && !(certificate_whitelist.include?(r.certification))) || (@date_filter != nil && year_blacklist.include?(r.release_date.year))
         next
       end
       @recommendation_list.push(r)
@@ -117,5 +169,10 @@ class RecommendationController < ApplicationController
     @recommendation_ids = @recommendation_list_ids[lower_bound..upper_bound]
     @recommendation_list = @recommendation_list[lower_bound..upper_bound]
     
+    puts params
+    puts @certificate_filter
+    puts @date_filter
+    puts year_blacklist if year_blacklist != nil
+    puts certificate_whitelist if certificate_whitelist != nil
   end
 end

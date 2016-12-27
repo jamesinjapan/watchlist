@@ -477,6 +477,17 @@ fieldset label input[type="checkbox"] {
   display: inline;
 }
 
+.filter-buttons {
+  padding: 0px 10px;
+  margin: 10px 0px;
+  flex: 1 0 5%;
+}
+
+.filter-search-div {
+  border-top: 1px solid #629ABA;
+  padding: 20px;
+}
+
 // TAG CLOUD STYLING
 .tag-cloud {
   font-size: 14px;

@@ -7,7 +7,101 @@
   <div class="row">
     <div class="col-xs-12 page-title">
       <h1>Recommendations based on <%= @based_on.join(", ").downcase %></h1>
+      <% if @certificate_filter != nil || @date_filter != nil %>
+        <h5>Filtered by 
+          <%= "era" if @date_filter != nil %>
+          <%= " and " if @certificate_filter != nil && @date_filter != nil %>
+          <%= "certificate" if @certificate_filter != nil %>
+          <a class="btn btn-default btn-xs" href="<%= recommendation_index_path(params.slice(:k,:g)) %>"><span class='glyphicon glyphicon-remove'></span> Remove filter</a>
+        </h5>
+      <% end %>
       <p>Page <%= @page %> of <%= @total_pages %> (Total number of results: <%= @recommendation_list_ids.count %>)</p>
+      <div class="filter-by-certificate row row-eq-height">
+        <legend class="col-xs-12">Filter results by certificate:</legend>
+        <div class="filter-buttons text-center">
+          <%= image_tag image_path("mpaa/g.png"), alt: "G", height: '30', id:"c=g", class: "img-filter", data: {on_url: image_path("mpaa/g.png"), off_url: image_path("mpaa/g-b.png")} %>
+        </div>
+        <div class="filter-buttons text-center">
+          <%= image_tag image_path("mpaa/pg.png"), alt: "PG", height: '30', id:"c=pg", class: "img-filter", data: {on_url: image_path("mpaa/pg.png"), off_url: image_path("mpaa/pg-b.png")} %>
+        </div>
+        <div class="filter-buttons text-center">
+          <%= image_tag image_path("mpaa/pg-13.png"), alt: "PG-13", height: '30', id:"c=pg-13", class: "img-filter", data: {on_url: image_path("mpaa/pg-13.png"), off_url: image_path("mpaa/pg-13-b.png")} %>
+        </div>
+        <% if user_signed_in? && @include_adult %>
+          <div class="filter-buttons text-center">
+            <%= image_tag image_path("mpaa/r.png"), alt: "R", height: '30', id:"c=r", class: "img-filter", data: {on_url: image_path("mpaa/r.png"), off_url: image_path("mpaa/r-b.png")} %>
+          </div>
+          <div class="filter-buttons text-center">
+            <%= image_tag image_path("mpaa/nc-17.png"), alt: "NC-17", height: '30', id:"c=nc-17", class: "img-filter", data: {on_url: image_path("mpaa/nc-17.png"), off_url: image_path("mpaa/nc-17-b.png")} %>
+          </div>
+          <div class="filter-buttons text-center">
+            <%= image_tag image_path("mpaa/nr.png"), alt: "Not Rated", height: '30', id:"c=nr", class: "img-filter", data: {on_url: image_path("mpaa/nr.png"), off_url: image_path("mpaa/nr-b.png")} %>
+          </div>
+        <% end %>
+      </div>
+      <div class="filter-by-era row row-eq-height">
+        <legend class="col-xs-12">Filter results by era:</legend>
+        <div class="filter-buttons text-center">
+          <button type="button" id="d=silent" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+            Silent (~1927)
+          </button>
+        </div>
+        <div class="filter-buttons text-center">
+          <button type="button" id="d=sound" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+            Sound (~1940)
+          </button>
+        </div>
+        <div class="filter-buttons text-center">
+          <button type="button" id="d=1940s" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+            1940s
+          </button>
+        </div>
+        <div class="filter-buttons text-center">
+          <button type="button" id="d=1950s" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+            1950s
+          </button>
+        </div>
+        <div class="filter-buttons text-center">
+          <button type="button" id="d=1960s" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+            1960s
+          </button>
+        </div>
+        <div class="filter-buttons text-center">
+          <button type="button" id="d=1970s" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+            1970s
+          </button>
+        </div>
+        <div class="filter-buttons text-center">
+          <button type="button" id="d=1980s" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+            1980s
+          </button>
+        </div>
+        <div class="filter-buttons text-center">
+          <button type="button" id="d=1990s" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+            1990s
+          </button>
+        </div>
+        <div class="filter-buttons text-center">
+          <button type="button" id="d=2000s" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+            2000s
+          </button>
+        </div>
+        <div class="filter-buttons text-center">
+          <button type="button" id="d=2010s" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+            2010s
+          </button>
+        </div>
+        <% if Time.now.year > 2019 %>
+          <div class="filter-buttons text-center">
+            <button type="button" id="d=2020s" class="btn btn-primary btn-filter" data-toggle="button" aria-pressed="false" autocomplete="off">
+              2020s
+            </button>
+          </div>
+        <% end %>
+      </div>
+      <div class="filter-search-div row row-eq-height">
+          <a id="filter-search" class="btn btn-primary" href="<%= recommendation_index_path(params.slice(:k,:g,:c,:d)) %>"><span class='glyphicon glyphicon-search'></span> Filter results</a>
+      </div>
       <%= render partial: "shared/search_pages", locals: {current_page: @page, lowest_page: @lowest_page, highest_page: @highest_page, total_pages: @total_pages} %>
     </div>
     <div class="col-xs-12">
@@ -22,3 +116,4 @@
     </div>
   </div>
 </div>
+<%= javascript_include_tag "recommendationfilter.js" %>

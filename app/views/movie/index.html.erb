@@ -27,15 +27,19 @@
     <div class="movie-details-div">
       <div class="row row-eq-height">
         <div class="movie-details">
-          <legend>Release date</legend>
+          <legend>Certificate</legend>
           <div class="content">
-            <%= @movie_details.key?(:release_date) && @movie_details[:release_date] != "" && @movie_details[:release_date] != nil ? @movie_details[:release_date] : "Release date data unavailable." %>
+            <% if @movie_details.key?(:certification) && @movie_details[:certification] != "" && @movie_details[:certification] != nil %>
+              <%= image_tag image_path("mpaa/#{@movie_details[:certification].to_s.downcase}.png"), alt: @movie_details[:certification], height: '30' %>
+            <% else %>
+              Certificate data unavailable.
+            <% end %>
           </div>
         </div>
         <div class="movie-details">
-          <legend>Certificate</legend>
+          <legend>Release date</legend>
           <div class="content">
-            <%= @movie_details.key?(:certification) && @movie_details[:certification] != "" && @movie_details[:certification] != nil ? @movie_details[:certification] : "Certificate data unavailable." %>
+            <%= @movie_details.key?(:release_date) && @movie_details[:release_date] != "" && @movie_details[:release_date] != nil ? @movie_details[:release_date] : "Release date data unavailable." %>
           </div>
         </div>
         <div class="movie-details">
