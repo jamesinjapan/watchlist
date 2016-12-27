@@ -75,59 +75,62 @@
           </div>
         </div>
       </div>
-      <% if @movie_details.key?(:release_date) && @movie_details[:release_date] != nil && @movie_details[:release_date].to_datetime < DateTime.now %>
+      <% p @movie_details[:release_date] %>
+      <% if @movie_details.key?(:release_date) && @movie_details[:release_date] != nil && @movie_details[:release_date] != "" %>
         <div class="row row-eq-height">
-          <div class="movie-details">
-            <legend>User Rating</legend>
-            <div class="content">
-              <% if @movie_details.key?(:num_user_rating) %>
-                <div class="row">
-                  <div class="col-xs-12">
-                    <% if @movie_details[:avg_user_rating] > 1.6 %>
-                      <i class="material-icons">sentiment_very_satisfied</i>
-                    <% elsif @movie_details[:avg_user_rating] > 1.2 %>
-                      <i class="material-icons">sentiment_satisfied</i>
-                    <% elsif @movie_details[:avg_user_rating] < 0.8 %>
-                      <i class="material-icons">sentiment_dissatisfied</i>
-                    <% elsif @movie_details[:avg_user_rating] < 0.4 %>
-                      <i class="material-icons">sentiment_very_dissatisfied</i>
-                    <% else %>
-                      <i class="material-icons">sentiment_neutral</i>
-                    <% end %>
+          <% if @movie_details[:release_date].to_datetime < DateTime.now %>
+            <div class="movie-details">
+              <legend>User Rating</legend>
+              <div class="content">
+                <% if @movie_details.key?(:num_user_rating) %>
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <% if @movie_details[:avg_user_rating] > 1.6 %>
+                        <i class="material-icons">sentiment_very_satisfied</i>
+                      <% elsif @movie_details[:avg_user_rating] > 1.2 %>
+                        <i class="material-icons">sentiment_satisfied</i>
+                      <% elsif @movie_details[:avg_user_rating] < 0.8 %>
+                        <i class="material-icons">sentiment_dissatisfied</i>
+                      <% elsif @movie_details[:avg_user_rating] < 0.4 %>
+                        <i class="material-icons">sentiment_very_dissatisfied</i>
+                      <% else %>
+                        <i class="material-icons">sentiment_neutral</i>
+                      <% end %>
+                    </div>
+                    <div class="col-xs-12">
+                      <%= @movie_details[:num_user_rating] + " Ratings" %>
+                    </div>
                   </div>
-                  <div class="col-xs-12">
-                    <%= @movie_details[:num_user_rating] + " Ratings" %>
-                  </div>
-                </div>
+                <% else %>
+                  <%= @movie_details[:avg_user_rating] %>
+                <% end %>
+              </div>
+            </div>
+            <div class="movie-details">
+              <% if user_signed_in? %>
+                <form action="<%= movie_submit_rating_path %>" method="get" name="yourratingform">
+                  <fieldset>
+                    <legend>Your Rating</legend>
+                    <div class="row">
+                      <div class="col-xs-4 text-center rating-radio">
+                        <%= radio_button_tag :r, "2", rating_checked?("2"), onclick: "document.yourratingform.submit();" %><label for="r_2"><i class="material-icons">sentiment_very_satisfied</i></label>
+                      </div>
+                      <div class="col-xs-4 text-center rating-radio">
+                        <%= radio_button_tag :r, "1", rating_checked?("1"), onclick: "document.yourratingform.submit();" %><label for="r_1"><i class="material-icons">sentiment_neutral</i></label>
+                      </div>
+                      <div class="col-xs-4 text-center rating-radio">
+                        <%= radio_button_tag :r, "0", rating_checked?("0"), onclick: "document.yourratingform.submit();" %><label for="r_0"><i class="material-icons">sentiment_very_dissatisfied</i></label>
+                      </div>
+                    </div>
+                    <%= hidden_field_tag :m, params[:m], :id => "movie-id", :value => @movie_details[:tmdb] %>
+                  </fieldset>
+                </form>  
               <% else %>
-                <%= @movie_details[:avg_user_rating] %>
+                <legend>Your Rating</legend>
+                <%= link_to "Sign in", new_user_session_path %> or <%= link_to "sign up", new_user_registration_path %> to rate this movie.
               <% end %>
             </div>
-          </div>
-          <div class="movie-details">
-            <% if user_signed_in? %>
-              <form action="<%= movie_submit_rating_path %>" method="get" name="yourratingform">
-                <fieldset>
-                  <legend>Your Rating</legend>
-                  <div class="row">
-                    <div class="col-xs-4 text-center rating-radio">
-                      <%= radio_button_tag :r, "2", rating_checked?("2"), onclick: "document.yourratingform.submit();" %><label for="r_2"><i class="material-icons">sentiment_very_satisfied</i></label>
-                    </div>
-                    <div class="col-xs-4 text-center rating-radio">
-                      <%= radio_button_tag :r, "1", rating_checked?("1"), onclick: "document.yourratingform.submit();" %><label for="r_1"><i class="material-icons">sentiment_neutral</i></label>
-                    </div>
-                    <div class="col-xs-4 text-center rating-radio">
-                      <%= radio_button_tag :r, "0", rating_checked?("0"), onclick: "document.yourratingform.submit();" %><label for="r_0"><i class="material-icons">sentiment_very_dissatisfied</i></label>
-                    </div>
-                  </div>
-                  <%= hidden_field_tag :m, params[:m], :id => "movie-id", :value => @movie_details[:tmdb] %>
-                </fieldset>
-              </form>  
-            <% else %>
-              <legend>Your Rating</legend>
-              <%= link_to "Sign in", new_user_session_path %> or <%= link_to "sign up", new_user_registration_path %> to rate this movie.
-            <% end %>
-          </div>
+          <% end %>
           <div class="movie-details">
             <% if user_signed_in? && @user_rating == "" && (current_user.watchlist == nil || !(current_user.watchlist.include?(@movie_details[:id].to_s))) %>
               <form action="<%= movie_add_to_watchlist_path %>" method="get" name="addtowatchlistform">
@@ -216,15 +219,15 @@
       </fieldset>
       <fieldset>
         <legend>Keywords: </legend>
-        <% if @current_movie.keywords == nil %>
-          <% @current_movie = Movie.find(movie_details[:id]) %>
-        <% end %>
-        <% @current_movie.keywords.any? %>
+        <% unless @current_movie.keyword_list == nil || @current_movie.keyword_list.empty? %>
           <% @current_movie.keywords.each do |tag| %>
-          <% next if user_signed_in? && @current_user.hidden_tags != nil && @current_user.hidden_tags.split(",").include?(tag.id.to_s) %>
-          <button type="button" id="k=<%= tag.id.to_s %>" class="btn btn-primary btn-keyword" data-toggle="button" aria-pressed="false" autocomplete="off">
-            <%= tag.name %>
-          </button>
+            <% next if user_signed_in? && @current_user.hidden_tags != nil && @current_user.hidden_tags.split(",").include?(tag.id.to_s) %>
+            <button type="button" id="k=<%= tag.id.to_s %>" class="btn btn-primary btn-keyword" data-toggle="button" aria-pressed="false" autocomplete="off">
+              <%= tag.name %>
+            </button>
+          <% end %>
+        <% else %>
+          <div class="content">No keywords saved for this movie</div
         <% end %>
       </fieldset>
       <form action="<%= movie_add_keyword_to_movie_path %>" method="post" id="add-keyword-form" class="form-inline">

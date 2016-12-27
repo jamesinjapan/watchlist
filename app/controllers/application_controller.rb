@@ -163,16 +163,6 @@ class ApplicationController < ActionController::Base
         end
       end
 
-      if tmdb_data.key?("keywords") && tmdb_data["keywords"] != nil && local_data != nil
-        tmdb_keywords = tmdb_data["keywords"]["keywords"].map { |v| v["name"]}
-        p tmdb_keywords
-        new_keywords = tmdb_keywords - local_data.keyword_list
-        new_keywords.each do |keyword|
-          local_data.keyword_list.add(keyword) if keyword != "" && keyword != nil && !(keyword =~ /\p{Han}|\p{Katakana}|\p{Hiragana}|\p{Hangul}|\p{Cyrillic}/)
-        end
-        local_data.save! if new_keywords.count > 0
-      end
-      
       if tmdb_data["release_dates"]["results"].empty?
         puts "tmdb_id #{movie_details[:tmdb]}: tmdb release dates data available"
       else
@@ -283,6 +273,28 @@ class ApplicationController < ActionController::Base
       puts local_data.keyword_list
       local_data.save! 
     end
+    
+    local_data = Movie.find_by(tmdb: movie_details[:tmdb])
+    puts "LOCAL DATA REFRESHED: "
+    puts local_data.inspect
+    
+    puts "KEYWORDS: "
+    puts tmdb_data["keywords"]
+    
+    puts tmdb_data.key?("keywords") && tmdb_data["keywords"] != nil && local_data != nil
+    
+    if tmdb_data.key?("keywords") && tmdb_data["keywords"] != nil && local_data != nil
+      tmdb_keywords = tmdb_data["keywords"]["keywords"].map { |v| v["name"]}
+      p tmdb_keywords
+      new_keywords = tmdb_keywords - local_data.keyword_list
+      new_keywords.each do |keyword|
+        local_data.keyword_list.add(keyword) if keyword != "" && keyword != nil && !(keyword =~ /[^\p{InBasicLatin}]/)
+      end
+      puts local_data.keyword_list
+      local_data.save! if new_keywords.count > 0
+      local_data = Movie.find_by(tmdb: movie_details[:tmdb])
+    end
+    
     return movie_details
   end
   

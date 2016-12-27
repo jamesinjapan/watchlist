@@ -8,8 +8,10 @@ class RecommendationController < ApplicationController
     # Build list of movie ids to recommend based on parameters given
     
     @based_on = Array.new
-    if @keywords != nil
-      @based_on = @based_on + TagKey.where(id: @keywords).pluck(:tag_text)
+    if @keywords != nil 
+      ActsAsTaggableOn::Tag.where(id: @keywords).each do |tag| 
+        @based_on.push(tag.name)
+      end
     end
     if @genres != nil
       @genres.each { |v| @based_on.push(TMDB_GENRE_LIST.select { |g| g["id"] == v.to_i }[0]["name"]) }
@@ -20,8 +22,12 @@ class RecommendationController < ApplicationController
     genre_recommendations = []
     
     if @keywords != nil
-      @keywords.each_with_index do |v, i|
-        keyword_recommendations[i] = Tag.where(tag_key_id: v).pluck(:movie_id)
+      if @keywords.kind_of?(String)
+        keyword_recommendations.push(Movie.tagged_with(@based_on[0]).pluck(:id))
+      else
+        @keywords.each_with_index do |v, i|
+          keyword_recommendations[i] = Movie.tagged_with(@based_on[i]).pluck(:id)
+        end
       end
       recommendation_ids_k = keyword_recommendations.max_by(&:length)
       keyword_recommendations -= [recommendation_ids_k]
@@ -48,13 +54,14 @@ class RecommendationController < ApplicationController
     end
     
     # Remove movie user began search with
-    
-    @original_movie = Movie.find_by(tmdb: params[:m])
-    if recommendations_full.include?(params[:m])
-      recommendations_full.delete(params[:m])
+    if params[:m]
+      @original_movie = Movie.find_by(tmdb: params[:m])
+      if recommendations_full.include?(params[:m])
+        recommendations_full.delete(params[:m])
+      end
+      params.delete(:m)
     end
-    params.delete(:m)
-    
+    puts recommendations_full
     # Move movies matching multiple criteria to front of list
     
     recommendations_dupes = recommendations_full.detect{ |v| recommendations_full.count(v) > 1 }

@@ -2,9 +2,8 @@ class MovieController < ApplicationController
   
   def index
     @movie_id = params[:m]
-    @current_movie = Movie.find_by(tmdb: @movie_id)
-    
     @movie_details = movie_details_creator(@movie_id,true)
+    @current_movie = Movie.find_by(tmdb: @movie_id)
     
     if @current_movie && @current_movie.keyword_list != nil
       @keyword_list = @current_movie.keyword_list
@@ -47,7 +46,7 @@ class MovieController < ApplicationController
         break
       end
       
-      if v["release_date"].to_date > 6.months.ago
+      if v["release_date"] != nil && v["release_date"].to_date > 6.months.ago
         next
       end
       
@@ -153,6 +152,7 @@ class MovieController < ApplicationController
       current_user.save!
       puts "Record updated"
       update_recommendations_list_in_background(current_user)
+    elsif current_user.watchlist == nil
     else
       flash[:danger] = "Error removing from watchlist"
     end
@@ -162,7 +162,7 @@ class MovieController < ApplicationController
   
   # Update user's frontpage welcome list in background to reduce impact on user
   def update_recommendations_list_in_background(user)
-    if user && user.ratings.count > 0 && current_user.watchlist.split(",").count <= 5
+    if user && user.ratings.count > 0 && (current_user.watchlist == nil || current_user.watchlist.split(",").count <= 5)
       include_adult = include_adult?(true,user)
       recommendations_list = []
       good_ratings = user.ratings.order(id: :desc).where(rating: "2").pluck(:movie_id)
